@@ -10,7 +10,10 @@ function X(p) {
 }
 
 class Package {
+    static counter = 0;
     constructor(start) {
+        this.id = Package.counter;
+        Package.counter++;
         this.start = start;
         this.router = [];// time turn on server input
         this.duration = [];// time duration in server
@@ -83,6 +86,9 @@ class NetQueue {
 
         this.out = null;
 
+        this.input = {};
+        this.output = {};
+
         this.time = 0;
         this.create_next = 0;
     }
@@ -110,10 +116,7 @@ class NetQueue {
                 else
                     this.out = this.next, this.next = null;
             }
-        }
-        console.log(`    ___        ___        ___ `);
-        console.log(` ->  ${this.queues[0].pack_queue.length} |(${this.queues[0].server_pack?'O':' '}) ->  ${this.queues[1].pack_queue.length} |(${this.queues[1].server_pack?'O':' '}) ->  ${this.queues[2].pack_queue.length} |(${this.queues[2].server_pack?'O':' '})`);
-        console.log(`    ---        ---        --- `);
+        }        
 
         this.time++;
     }
