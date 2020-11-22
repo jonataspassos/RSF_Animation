@@ -1,1 +1,13 @@
+<svg>
+    <defs>
+        <filter id="shadow" x="0" y="0" width="200%" height="200%">
+            <feOffset result="offOut" in="SourceGraphic" dx="5" dy="5" />
+            <feGaussianBlur result="blurOut" in="offOut" stdDeviation="10" />
+            <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+        </filter>
+    </defs>
+
+    <g></g>
+</svg>
+<script src="https://d3js.org/d3.v6.min.js"></script>
 <script src="SF.js"></script>
