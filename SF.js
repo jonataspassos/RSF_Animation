@@ -9,7 +9,7 @@ var time_turn = 0.001,
 	 * @param {Object} object
 	 * @return object like parameter
 	 */
-function deep_copy (object) {
+function deep_copy(object) {
     return JSON.parse(JSON.stringify(object));
 }
 
@@ -255,6 +255,13 @@ class NetQueue {
         var horizontal_padding = 80,
             vertical_padding = 60;
 
+        var transition_out = 0.25,
+            transition_step1 = 0.15,
+            transition_step2 = 0.2,
+            transition_step3 = 0.15,
+            transition_in = 0.25;
+
+        // Start Draw Net Queue
         this.input.selectAll("path").data(["M 50 0 L 75 25 75 75 50 100 0 50 z",
             "M 75 25 L 75 75 100 50"])
             .enter().append("path").attr("class", function (d, i) { return i ? "door" : "base" })
@@ -266,23 +273,135 @@ class NetQueue {
             .attr("d", function (d) { return d });
 
         this.input.attr("transform", `translate(0,${vertical_padding - 20})`)
-        this.output.attr("transform", `translate(0,${2 * vertical_padding + 60 - 20})`)
+        this.output.attr("transform", `translate(0,${2 * vertical_padding + 60 - 20})`);
 
+        // New Package
+        var p_next = this.g.select(".pack-start")
+        if (!p_next.empty()) {
+            p_next
+                .attr("transform", `translate(25,${vertical_padding + 10})`);
+
+            this.input.select(".door").transition()
+                .duration(transition_duration * transition_out)
+                .attr("d", "M 75 25 L 125 25 100 0");
+
+            var x_package = 100 + horizontal_padding - 60;
+
+            p_next.transition().delay(transition_duration * transition_in)
+                .duration(transition_duration * (transition_step1 + transition_step2 + transition_step3))
+                .attr("transform", `translate(${x_package},${vertical_padding + 10})`);
+
+            p_next.classed("pack-start", false);
+
+            this.input.select(".door").transition()
+                .delay(transition_duration * (transition_in + transition_step1))
+                .duration(transition_duration * transition_step2)
+                .attr("d", "M 75 25 L 75 75 100 50");
+        }
+
+        // Out Packages
+        for (var i = 0; i < this.r.length - 1; i++) {
+            var out_p = this.g.select(`.out-${i}`)
+            if (!out_p.empty()) {
+                out_p.classed(`out-${i}`, false);
+
+                var last = {
+                    x: 100 + horizontal_padding + this.queues[this.r[i]].x_index *
+                        (150 + horizontal_padding) + 160,
+                    y: vertical_padding + this.queues[this.r[i]].y_index *
+                        (vertical_padding + 60) + 10
+                }
+
+                var now = {
+                    x: 100 + horizontal_padding + this.queues[this.r[i + 1]].x_index *
+                        (150 + horizontal_padding) - 70,
+                    y: vertical_padding + this.queues[this.r[i + 1]].y_index *
+                        (vertical_padding + 60) + 10
+                }
+
+                if (last.y == now.y && last.x == now.x) {
+                    out_p.transition()
+                        .duration(transition_duration * (transition_in + transition_step1 + transition_step2 + transition_step3))
+                        .attr("transform", `translate(${last.x},${last.y})`);
+                } else {
+                    out_p.transition()
+                        .duration(transition_duration * transition_in)
+                        .attr("transform", `translate(${last.x},${last.y})`);
+
+                    out_p.transition().delay(transition_duration * transition_in)
+                        .duration(transition_duration * (transition_step1))
+                        .attr("transform", `translate(${last.x},${vertical_padding - 50})`);
+
+                    out_p.transition().delay(transition_duration * (transition_in + transition_step1))
+                        .duration(transition_duration * (transition_step2))
+                        .attr("transform", `translate(${now.x},${vertical_padding - 50})`);
+
+                    out_p.transition().delay(transition_duration * (transition_in + transition_step1 + transition_step2))
+                        .duration(transition_duration * transition_step3)
+                        .attr("transform", `translate(${now.x},${now.y})`);
+                }
+            }
+        }
+
+        var out_p = this.g.select(`.pack-end`)
+        if (!out_p.empty()) {
+            var last = {
+                x: 100 + horizontal_padding + this.queues[this.r[this.r.length - 1]].x_index *
+                    (150 + horizontal_padding) + 160,
+                y: vertical_padding + this.queues[this.r[this.r.length - 1]].y_index *
+                    (vertical_padding + 60) + 10
+            }
+
+            out_p.classed(`pack-end`, false);
+
+            out_p.transition()
+                .duration(transition_duration * transition_in)
+                .attr("transform", `translate(${last.x},${last.y})`);
+
+            out_p.transition()
+                .delay(transition_duration * transition_in)
+                .duration(transition_duration * (transition_step1))
+                .attr("transform", `translate(${last.x},${2 * vertical_padding + 60 + 10})`);
+
+            out_p.transition()
+                .delay(transition_duration * (transition_in + transition_step1))
+                .duration(transition_duration * (transition_step2 + transition_step3))
+                .attr("transform", `translate(${25},${2 * vertical_padding + 60 + 10})`);
+
+            this.output.select(".door").transition()
+                .delay(transition_duration * (transition_in + transition_step1))
+                .duration(transition_duration * transition_step2)
+                .attr("d", "M 75 25 L 125 25 100 0");
+
+            this.output.select(".door").transition()
+                .delay(transition_duration * (transition_in + transition_step1 + transition_step2 + transition_step3))
+                .duration(transition_duration * transition_in)
+                .attr("d", "M 75 25 L 75 75 100 50");
+
+        }
+
+
+        // Draw Queues
         for (var i = 0; i < this.queues.length; i++) {
             var x = 100 + horizontal_padding + this.queues[i].x_index * (150 + horizontal_padding);
             var y = vertical_padding + this.queues[i].y_index * (vertical_padding + 60);
 
             this.queues[i].draw().g.attr("transform", `translate(${x},${y})`)//.attr("filter","url(#shadow)");
 
-            var x_axis = d3.scaleBand().domain(range(this.queues[i].pack_queue.length<4?4:this.queues[i].pack_queue.length))
-                .range([x+80,x]).paddingInner(0.1),
-                y_pack = y+10,
-                scale_x = x_axis.bandwidth()/40;
+            var x_axis = d3.scaleBand().domain(range(this.queues[i].pack_queue.length < 4 ? 4 : this.queues[i].pack_queue.length))
+                .range([x + 80, x]).paddingInner(0.1),
+                y_pack = y + 10,
+                scale_x = x_axis.bandwidth() / 40;
 
-            this.g.selectAll(`.p-queue-${this.queues[i].id}`).data(this.queues[i].queue)
+            this.g.selectAll(`.p-queue-${this.queues[i].id}`).data(this.queues[i].queue).transition()
+                .delay(transition_duration * (transition_in + transition_step1 + transition_step2 + transition_step3))
+                .duration(transition_duration * transition_in)
                 .attr("transform", function (d, i) { return `translate(${x_axis(d.queue_ord)},${y_pack})scale(${scale_x},1)` })
 
-            this.g.select(`.server-${this.queues[i].id}`).attr("transform",`translate(${x+100},${y_pack})scale(1,1)`);
+            this.g.select(`.server-${this.queues[i].id}`).transition()
+                .delay(transition_duration * (transition_in + transition_step1 + transition_step2 + transition_step3))
+                .duration(transition_duration * transition_in)
+                .attr("transform", `translate(${x + 100},${y_pack})scale(1,1)`);
         }
         return this;
     }
