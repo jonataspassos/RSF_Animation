@@ -148,7 +148,7 @@ class Queue {
     }
     draw() {
         this.g.selectAll("circle").data([null]).enter().append("circle");
-        this.g.select("circle").attr("r", 30).attr("cy", 30).attr("cx", 120).attr("fill", "#33A");
+        this.g.select("circle").attr("r", 35).attr("cy", 30).attr("cx", 120).attr("fill", "#33A");
 
         this.g.selectAll("path").data([null]).enter().append("path");
         this.g.select("path").attr("d", "M 0 0 L 90 0 90 60 0 60 0 55 85 55 85 5 0 5 z").attr("fill", "#333");
@@ -323,6 +323,14 @@ class NetQueue {
                     out_p.transition()
                         .duration(transition_duration * (transition_in + transition_step1 + transition_step2 + transition_step3))
                         .attr("transform", `translate(${last.x},${last.y})`);
+                } else if (last.x == now.x) {
+                    out_p.transition()
+                        .duration(transition_duration * transition_in)
+                        .attr("transform", `translate(${last.x},${last.y})`);
+
+                    out_p.transition().delay(transition_duration * transition_in)
+                        .duration(transition_duration * (transition_step1 + transition_step2 + transition_step3))
+                        .attr("transform", `translate(${now.x},${now.y})`);
                 } else {
                     out_p.transition()
                         .duration(transition_duration * transition_in)
@@ -366,7 +374,7 @@ class NetQueue {
             out_p.transition()
                 .delay(transition_duration * (transition_in + transition_step1))
                 .duration(transition_duration * (transition_step2 + transition_step3))
-                .attr("transform", `translate(${25},${2 * vertical_padding + 60 + 10})`);
+                .attr("transform", `translate(${25},${2 * vertical_padding + 60 + 10})`).remove();
 
             this.output.select(".door").transition()
                 .delay(transition_duration * (transition_in + transition_step1))
