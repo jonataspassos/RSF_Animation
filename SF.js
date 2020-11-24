@@ -59,7 +59,7 @@ class Package {
     }
     get timeoutserver() {
         var i = this.router.length - 1;
-        return this.router[i] + this.duration[i];
+        return this.duration[i]!=-1?this.router[i] + this.duration[i]:-1;
     }
 
     get r() {
@@ -98,7 +98,7 @@ class Queue {
 
         //Parametros de processamento da fila
         this.m = m * time_turn;//mi em turnos
-        this.tms = 1 / this.m;//tms em turnos
+        this.tms = this.m? 1 / this.m : -1;//tms em turnos -1 infinito
 
         //Lista de pacotes na fila
         this.pack_queue = [];
@@ -107,6 +107,10 @@ class Queue {
 
         //Passagem de pacotes no sistema
         this.log = [];
+
+        if(this.m<=0){
+            alert(`A fila ${this.id} possui taxa de serviço inválida. Insira um valor de μ maior que 0.`)
+        }
 
         return this;
     }
@@ -125,7 +129,7 @@ class Queue {
             next.g.classed(`p-queue-${this.id}`, true);
             this.pack_queue.push(next);//entra na fila
         }
-        if (!this.server_pack || time >= this.server_pack.timeoutserver) {
+        if (this.m && (!this.server_pack || time >= this.server_pack.timeoutserver)) {
             var ret = this.server_pack;
 
             //this.server_pack.update = true;
@@ -135,7 +139,7 @@ class Queue {
                 this.pack_queue = this.pack_queue.slice(1);//atualiza a fila
 
                 this.server_pack.router.push(time);//Marca o tempo de entrada
-                this.server_pack.duration.push(Math.ceil(X(this.tms)));//Calcula a duração do 
+                this.server_pack.duration.push(this.tms==-1?-1:Math.ceil(X(this.tms)));//Calcula a duração do 
                 //pacote no servidor
                 this.server_pack.g.classed(`p-queue-${this.id}`, false);
                 this.server_pack.g.classed(`server-${this.id}`, true);
@@ -171,7 +175,7 @@ class NetQueue {
 
         //Parâmetros de entrada de pacotes
         this.l = l * time_turn;//lambda em turnos
-        this.imc = 1 / this.l;
+        this.imc = this.l? 1 / this.l : -1; // -1 infinito
         this.n = 0; // Numero de pacotes que passaram pelo sistema
 
         //Roteamento
@@ -211,6 +215,20 @@ class NetQueue {
         this.time = 0;
         this.create_next = 0;
 
+        if(this.l<=0){
+            alert("Este sistema de fila possui entrada inválida. Insira um valor de λ maior que 0.")
+        }
+
+        if(this.r.length){
+            for(var i=0;i<this.r.length;i++){
+                if(r[i]>=this.queues.length)
+                    alert(`O vetor de rotas na posição ${i} indica uma fila que não existe [${r[i]}]. Insira um valor entre 0 e ${this.queues.length-1}.`);
+            }
+        }else{
+            alert(`O vetor de rotas está vazio. Insira valores entre 0 e ${this.queues.length-1} para construir o caminho no sistema de filas.`);
+        }
+        
+
         return this;
     }
     turn() { // Gerencia a entrada e saída de pacotes de cada sistema de fila
@@ -226,14 +244,14 @@ class NetQueue {
             }
         }
 
-        if (this.time >= this.create_next) {
+        if (this.l && this.time >= this.create_next) {
             this.next = new Package(this.time, this.g.select(".packages").append("g")).draw();
             this.next.n = this.n++;
             this.next.g.classed("pack-start", true);
 
             this.queues[this.r[0]].turn(this.time, this.next);
 
-            this.create_next = this.time + Math.ceil(X(this.imc));
+            this.create_next = this.imc==-1? -1 : this.time + Math.ceil(X(this.imc));
         }
 
         this.time++;
