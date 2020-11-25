@@ -40,22 +40,22 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon1">λ</span>
                         </div>
-                        <input id="lambda-input" type="text" class="form-control" placeholder="λ" aria-label="lambda"
-                            aria-describedby="basic-addon1">
+                        <input id="lambda-input" type="text" class="form-control sf-param" placeholder="λ"
+                            aria-label="lambda" aria-describedby="basic-addon1">
                     </div>
                     <div class="col-4 input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon1">μ</span>
                         </div>
-                        <input id="mi-input" type="text" class="form-control" placeholder="μ" aria-label="mi"
+                        <input id="mi-input" type="text" class="form-control sf-param" placeholder="μ" aria-label="mi"
                             aria-describedby="basic-addon1">
                     </div>
                     <div class="col-6 input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon1">r</span>
                         </div>
-                        <input id="router-input" type="text" class="form-control" placeholder="r" aria-label="rotas"
-                            aria-describedby="basic-addon1">
+                        <input id="router-input" type="text" class="form-control sf-param" placeholder="r"
+                            aria-label="rotas" aria-describedby="basic-addon1">
                     </div>
                 </div>
 
@@ -117,7 +117,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon1">Turno</span>
                             </div>
-                            <input id="turn-input" type="text" class="form-control"
+                            <input id="turn-input" type="text" class="form-control sf-param"
                                 placeholder="Nº Pacotes p/ Simulação" aria-label="lambda"
                                 aria-describedby="basic-addon1">
                             <div class="input-group-append">
@@ -128,7 +128,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon1">N</span>
                             </div>
-                            <input id="n-package-input" type="text" class="form-control"
+                            <input id="n-package-input" type="text" class="form-control sf-param"
                                 placeholder="Nº Pacotes p/ Simulação" aria-label="lambda"
                                 aria-describedby="basic-addon1">
                         </div>
@@ -137,7 +137,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon1">Transição</span>
                             </div>
-                            <input id="transition-input" type="text" class="form-control"
+                            <input id="transition-input" type="text" class="form-control animation-param"
                                 placeholder="tempo de transição" aria-label="time-transition"
                                 aria-describedby="basic-addon1">
                             <div class="input-group-append">
@@ -148,8 +148,9 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon1">Intervalo</span>
                             </div>
-                            <input id="interval-input" type="text" class="form-control" placeholder="tempo de intervalo"
-                                aria-label="time-state" aria-describedby="basic-addon1">
+                            <input id="interval-input" type="text" class="form-control animation-param"
+                                placeholder="tempo de intervalo" aria-label="time-state"
+                                aria-describedby="basic-addon1">
                             <div class="input-group-append">
                                 <span class="input-group-text" id="basic-addon1">ms</span>
                             </div>
@@ -157,7 +158,8 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                        <button type="button" class="btn btn-primary" onclick="update()" data-dismiss="modal">Salvar</button>
+                        <button type="button" class="btn btn-primary" onclick="update()"
+                            data-dismiss="modal">Salvar</button>
                     </div>
                 </div>
             </div>
@@ -173,7 +175,9 @@
             switch (state) {
                 case "none":
                     document.getElementById("start").disabled = false;
-                    document.querySelectorAll("input").disabled = true;
+                    var inputs = document.querySelectorAll(".sf-param")
+                    for (var i = 0; i < inputs.length; i++)
+                        inputs[i].disabled = true;
                     d3.select("#start").text("iniciar").classed("btn-info", false).classed("btn-success", true);
                     d3.select("#create").text("parar").classed("btn-danger", true).classed("btn-primary", false)
                     state = "created"
@@ -187,10 +191,15 @@
                     break;
                 default:
                     document.getElementById("start").disabled = true;
-                    document.querySelectorAll("input").disabled = false;
+                    var inputs = document.querySelectorAll(".sf-param")
+                    for (var i = 0; i < inputs.length; i++)
+                        inputs[i].disabled = false;
                     d3.select("#start").text("iniciar").classed("btn-info", false).classed("btn-success", true);
                     d3.select("#create").text("criar").classed("btn-danger", false).classed("btn-primary", true)
                     state = "none";
+
+                    Queue.count = 0;
+                    Package.count = 0;
 
                     if (rsf) {
                         clearInterval(rsf.animation_call);
@@ -206,6 +215,9 @@
                     if (rsf) {
                         d3.select("#start").text("pausar").classed("btn-info", true).classed("btn-success", false);
                         d3.select("#create").text("parar").classed("btn-danger", true).classed("btn-primary", false);
+                        var inputs = document.querySelectorAll(".animation-param")
+                        for (var i = 0; i < inputs.length; i++)
+                            inputs[i].disabled = true;
                         state = "started";
 
                         rsf.animation_call = setInterval(() => rsf.turn().draw(), state_duration + transition_duration)
@@ -214,6 +226,10 @@
                 default:
                     d3.select("#start").text("iniciar").classed("btn-info", false).classed("btn-success", true);
                     d3.select("#create").text("parar").classed("btn-danger", true).classed("btn-primary", false);
+                    var inputs = document.querySelectorAll(".animation-param")
+                    for (var i = 0; i < inputs.length; i++)
+                        inputs[i].disabled = false;
+
                     state = "paused";
 
                     if (rsf && rsf.animation_call)
