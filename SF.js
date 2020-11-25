@@ -13,6 +13,27 @@ function deep_copy(object) {
     return JSON.parse(JSON.stringify(object));
 }
 
+function downloadFile(content, filename) {
+    var supportsDownloadAttribute = 'download' in document.createElement('a');
+
+    if (supportsDownloadAttribute) {
+        var link = d3.select("body").append("a")
+            .attr("href", 'data:attachment/csv;base64,' + encodeURI(window.btoa(content)))
+            .attr("target",'_blank')
+            .attr("download",filename)
+        link._groups[0][0].click()
+        
+        setTimeout(function () {
+            link.remove();
+        }, 50);
+    } else if (typeof safari !== 'undefined') {
+        window.open('data:attachment/csv;charset=utf-8,' + encodeURI(content));
+    } else {
+        var blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+        saveAs(blob, filename);
+    }
+}
+
 /**
  * Returns a array with values orders as like samples:
  * range(5) -> [0,1,2,3,4]
@@ -263,6 +284,7 @@ class Queue {
                     this.statistics.is.insert(time - this.log[this.log.length - 1].tfs);
                 //Logs do sistema de fila
                 this.log.push({
+                    id: ret.id,
                     nf: ret.getNf(),
                     ic: (ret.r - 1 ? ret.router[ret.r - 2] + ret.duration[ret.r - 2] : ret.start)
                         - (this.log.length ? this.log[this.log.length - 1].tcf : 0),

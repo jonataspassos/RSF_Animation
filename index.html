@@ -31,7 +31,7 @@
 </head>
 
 <body>
-<h1 style="margin-left:5%">Simulacao de Rede de Sistemas de Fila M/M/1</h1>
+    <h1 style="margin-left:5%">Simulacao de Rede de Sistemas de Fila M/M/1</h1>
     <div class="header-control">
         <div class="row justify-content-md-center">
             <div class="col col-lg-7">
@@ -169,7 +169,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="endSimulationModalLabel">Resultados da Simulação</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                        onclick="stop_simulation()">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -190,7 +191,7 @@
                                 </tr>
                             </thead>
                             <tbody id="queue-parameters-modal">
-                                
+
                             </tbody>
 
                         </table>
@@ -232,15 +233,84 @@
                                 </tr>
                             </thead>
                             <tbody id="queue-results-modal">
-                                
+
                             </tbody>
                         </table>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Salvar</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                        onclick="stop_simulation()">Fechar</button>
+                    <button type="button" class="btn btn-info" onclick="save_log()">Salvar Logs</button>
+                    <button type="button" class="btn btn-primary" onclick="save_simulation()">Salvar</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: none;">
+        <div id="save">
+            <h1>Simulacao de Rede de Sistemas de Fila M/M/1</h1>
+            <h3>Parametros da Rede de Sistemas de Fila</h3>
+            <p>Número de sistemas de fila: <a id="nqueue-save">4</a> <br>
+                Sequencia: <a id="router-save">0-1; 1-2; 2-1; 1-3; 3-1; 1-0</a><br>
+                lambda: <a id="lambda-save">200 pps</a><br>
+                imc: <a id="imc-save">0.005 s</a></p>
+            <div>
+                <table border="1" cellpadding="3px">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">mi</th>
+                            <th scope="col">tms</th>
+                        </tr>
+                    </thead>
+                    <tbody id="queue-parameters-save">
+
+                    </tbody>
+
+                </table>
+            </div>
+
+            <h3>Resumo da Simulação</h3>
+            <div>
+                <table border="1" cellpadding="3px">
+                    <thead>
+                        <tr>
+                            <th scope="col" rowspan="2" style="text-align: center;">#</th>
+                            <th scope="col" rowspan="2" style="text-align: center;">T (s)</th>
+                            <th scope="col" rowspan="2" style="text-align: center;">N</th>
+                            <th scope="col" rowspan="2" style="text-align: center;">U (%)</th>
+                            <th scope="col" colspan="2" style="text-align: center;">nf</th>
+                            <th scope="col" colspan="2" style="text-align: center;">tts (s)</th>
+                            <th scope="col" colspan="2" style="text-align: center;">ic (s)</th>
+                            <th scope="col" colspan="2" style="text-align: center;">ts (s)</th>
+                            <th scope="col" colspan="2" style="text-align: center;">tef (s)</th>
+                            <th scope="col" colspan="2" style="text-align: center;">tps (s)</th>
+                            <th scope="col" colspan="2" style="text-align: center;">is (s)</th>
+                            <th scope="col" rowspan="2" style="text-align: center;">p0 (%)</th>
+                        </tr>
+                        <tr>
+                            <td scope="colgroup">E[nf]</td>
+                            <td scope="colgroup">DP[nf]</td>
+                            <td scope="colgroup">E[tts]</td>
+                            <td scope="colgroup">DP[tts]</td>
+                            <td scope="colgroup">E[ic]</td>
+                            <td scope="colgroup">DP[ic]</td>
+                            <td scope="colgroup">E[ts]</td>
+                            <td scope="colgroup">DP[ts]</td>
+                            <td scope="colgroup">E[tef]</td>
+                            <td scope="colgroup">DP[tef]</td>
+                            <td scope="colgroup">E[tps]</td>
+                            <td scope="colgroup">DP[tps]</td>
+                            <td scope="colgroup">E[is]</td>
+                            <td scope="colgroup">DP[is]</td>
+                        </tr>
+                    </thead>
+                    <tbody id="queue-results-save">
+
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -340,6 +410,8 @@
         }
 
         function end_simulation() {
+            pause_simulation();
+
             var modal = d3.select("#endSimulationModal");
             modal.select("#nqueue-modal").text(rsf.nqueue);
             modal.select("#router-modal").text(rsf.router);
@@ -364,7 +436,7 @@
                     return `<th scope="col">${i}</th>` +
                         `<td scope="col">${d.T.toFixed(3)}</td>` +
                         `<td scope="col">${d.N}</td>` +
-                        `<td scope="col">${(d.U*100).toFixed(1)}</td>` +
+                        `<td scope="col">${(d.U * 100).toFixed(1)}</td>` +
                         `<td scope="col">${d.E("nf").toFixed(3)}</td>` +
                         `<td scope="col">${d.σ("nf").toFixed(3)}</td>` +
                         `<td scope="col">${d.E("tts").toFixed(3)}</td>` +
@@ -379,13 +451,70 @@
                         `<td scope="col">${d.σ("tps").toFixed(3)}</td>` +
                         `<td scope="col">${d.E("is").toFixed(3)}</td>` +
                         `<td scope="col">${d.σ("is").toFixed(3)}</td>` +
-                        `<td scope="col">${(d.p0*100).toFixed(1)}</td>`
+                        `<td scope="col">${(d.p0 * 100).toFixed(1)}</td>`
                 })
 
             $('#endSimulationModal').modal('show');
+        }
 
+        function save_simulation() {
+            var save = d3.select("#save");
+            save.select("#nqueue-modal").text(rsf.nqueue);
+            save.select("#router-modal").text(rsf.router);
+            save.select("#lambda-modal").text(rsf.λ);
+            save.select("#imc-modal").text(rsf.imc.toFixed(3));
 
-            stop_simulation();
+            var table_param = save.select("#queue-parameters-save");
+            table_param.selectAll("tr").remove();
+            table_param.selectAll("tr").data(rsf.queues).enter()
+                .append("tr")
+                .html(function (d, i) {
+                    return `<th scope="col">${i}</th>` +
+                        `<td scope="col">${d.μ} pps</td>` +
+                        `<td scope="col">${d.tms.toFixed(3)} s</td>`
+                })
+
+            var table_results = save.select("#queue-results-save");
+            table_results.selectAll("tr").remove();
+            table_results.selectAll("tr").data(rsf.queues).enter()
+                .append("tr")
+                .html(function (d, i) {
+                    return `<th scope="col">${i}</th>` +
+                        `<td scope="col">${d.T.toFixed(3)}</td>` +
+                        `<td scope="col">${d.N}</td>` +
+                        `<td scope="col">${(d.U * 100).toFixed(1)}</td>` +
+                        `<td scope="col">${d.E("nf").toFixed(3)}</td>` +
+                        `<td scope="col">${d.σ("nf").toFixed(3)}</td>` +
+                        `<td scope="col">${d.E("tts").toFixed(3)}</td>` +
+                        `<td scope="col">${d.σ("tts").toFixed(3)}</td>` +
+                        `<td scope="col">${d.E("ic").toFixed(3)}</td>` +
+                        `<td scope="col">${d.σ("ic").toFixed(3)}</td>` +
+                        `<td scope="col">${d.E("ts").toFixed(3)}</td>` +
+                        `<td scope="col">${d.σ("ts").toFixed(3)}</td>` +
+                        `<td scope="col">${d.E("tef").toFixed(3)}</td>` +
+                        `<td scope="col">${d.σ("tef").toFixed(3)}</td>` +
+                        `<td scope="col">${d.E("tps").toFixed(3)}</td>` +
+                        `<td scope="col">${d.σ("tps").toFixed(3)}</td>` +
+                        `<td scope="col">${d.E("is").toFixed(3)}</td>` +
+                        `<td scope="col">${d.σ("is").toFixed(3)}</td>` +
+                        `<td scope="col">${(d.p0 * 100).toFixed(1)}</td>`
+                })
+
+            downloadFile(save.html(), `RSF.MM1.id-${rsf.id}.html`);
+        }
+
+        function save_log() {
+            var sep = ";";
+            var line = "\n";
+            str = ["id", "queue", "nf", "ic", "ts", "tcf", "tis", "tfs", "is"].join(sep)
+                 + line
+                + rsf.queues.map((d, i) => {
+                    return d.log.map((e) => {
+                        return [e.id, i, e.nf, e.ic, e.ts, e.tcf, e.tis, e.tfs, e.is]
+                            .join(sep);
+                    }).join(line);
+                }).join(line);
+            downloadFile(str, `RSF.MM1.id-${rsf.id}-log.csv`);
         }
 
         function btn_create() {
