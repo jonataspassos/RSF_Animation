@@ -31,7 +31,7 @@
 </head>
 
 <body>
-    <h1>Rede de Sistemas de Fila</h1>
+<h1 style="margin-left:5%">Simulacao de Rede de Sistemas de Fila M/M/1</h1>
     <div class="header-control">
         <div class="row justify-content-md-center">
             <div class="col col-lg-7">
@@ -62,14 +62,14 @@
             </div>
 
             <div class="col col-lg-3">
-                <button id="create" type="button" style="width:35%" class="btn btn-primary" onclick="create()">
+                <button id="create" type="button" style="width:35%" class="btn btn-primary" onclick="btn_create()">
                     Criar
                 </button>
-                <button id="start" type="button" style="width:35%" class="btn btn-success" onclick="start()"
+                <button id="start" type="button" style="width:35%" class="btn btn-success" onclick="btn_start()"
                     disabled>Iniciar</button>
 
                 <button type="button" class="btn btn-dark " data-toggle="modal" data-target="#settingsModal"
-                    onclick="settings()">
+                    onclick="btn_settings()">
                     <svg width="24px" height="24px" viewBox="0 0 16 16" class="bi bi-gear" fill="currentColor"
                         xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd"
@@ -82,85 +82,164 @@
 
 
         </div>
+    </div>
 
-        <div class="body-system">
-            <div class="row justify-content-md-center">
-                <div class="col col-lg-10">
-                    <svg width="100%" height="500px">
-                        <defs>
-                            <filter id="shadow" x="0" y="0" width="200%" height="200%">
-                                <feOffset result="offOut" in="SourceGraphic" dx="5" dy="5" />
-                                <feGaussianBlur result="blurOut" in="offOut" stdDeviation="10" />
-                                <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
-                            </filter>
-                        </defs>
+    <div class="body-system">
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-10">
+                <svg class="net-queue" width="100%" height="500px">
+                    <defs>
+                        <filter id="shadow" x="0" y="0" width="200%" height="200%">
+                            <feOffset result="offOut" in="SourceGraphic" dx="5" dy="5" />
+                            <feGaussianBlur result="blurOut" in="offOut" stdDeviation="10" />
+                            <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+                        </filter>
+                    </defs>
 
-                        <g></g>
-                    </svg>
+                    <g class="net-queue"></g>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">Configurações</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">Turno</span>
+                        </div>
+                        <input id="turn-input" type="text" class="form-control sf-param"
+                            placeholder="Nº Pacotes p/ Simulação" aria-label="lambda" aria-describedby="basic-addon1">
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="basic-addon1">s</span>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">N</span>
+                        </div>
+                        <input id="n-package-input" type="text" class="form-control sf-param"
+                            placeholder="Nº Pacotes p/ Simulação" aria-label="lambda" aria-describedby="basic-addon1">
+                    </div>
+                    Animação
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">Transição</span>
+                        </div>
+                        <input id="transition-input" type="text" class="form-control animation-param"
+                            placeholder="tempo de transição" aria-label="time-transition"
+                            aria-describedby="basic-addon1">
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="basic-addon1">ms</span>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">Intervalo</span>
+                        </div>
+                        <input id="interval-input" type="text" class="form-control animation-param"
+                            placeholder="tempo de intervalo" aria-label="time-state" aria-describedby="basic-addon1">
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="basic-addon1">ms</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" onclick="btn_update()"
+                        data-dismiss="modal">Salvar</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Settings Modal -->
-        <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="settingsModalLabel">Configurações</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+    <!-- Modal -->
+    <div class="modal fade" id="endSimulationModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+        aria-labelledby="endSimulationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="endSimulationModalLabel">Resultados da Simulação</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h6>Parametros da Rede de Sistemas de Fila</h6>
+                    <p>Número de sistemas de fila: <a id="nqueue-modal">4</a> <br>
+                        Sequencia: <a id="router-modal">0-1; 1-2; 2-1; 1-3; 3-1; 1-0</a><br>
+
+                        λ: <a id="lambda-modal">200 pps</a><br>
+                        imc: <a id="imc-modal">0.005 s</a></p>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">μ</th>
+                                    <th scope="col">tms</th>
+                                </tr>
+                            </thead>
+                            <tbody id="queue-parameters-modal">
+                                
+                            </tbody>
+
+                        </table>
                     </div>
-                    <div class="modal-body">
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon1">Turno</span>
-                            </div>
-                            <input id="turn-input" type="text" class="form-control sf-param"
-                                placeholder="Nº Pacotes p/ Simulação" aria-label="lambda"
-                                aria-describedby="basic-addon1">
-                            <div class="input-group-append">
-                                <span class="input-group-text" id="basic-addon1">s</span>
-                            </div>
-                        </div>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon1">N</span>
-                            </div>
-                            <input id="n-package-input" type="text" class="form-control sf-param"
-                                placeholder="Nº Pacotes p/ Simulação" aria-label="lambda"
-                                aria-describedby="basic-addon1">
-                        </div>
-                        Animação
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon1">Transição</span>
-                            </div>
-                            <input id="transition-input" type="text" class="form-control animation-param"
-                                placeholder="tempo de transição" aria-label="time-transition"
-                                aria-describedby="basic-addon1">
-                            <div class="input-group-append">
-                                <span class="input-group-text" id="basic-addon1">ms</span>
-                            </div>
-                        </div>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon1">Intervalo</span>
-                            </div>
-                            <input id="interval-input" type="text" class="form-control animation-param"
-                                placeholder="tempo de intervalo" aria-label="time-state"
-                                aria-describedby="basic-addon1">
-                            <div class="input-group-append">
-                                <span class="input-group-text" id="basic-addon1">ms</span>
-                            </div>
-                        </div>
+
+                    <h6>Resumo da Simulação</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover  table-sm">
+                            <thead>
+                                <tr>
+                                    <th scope="col" rowspan="2" style="text-align: center;">#</th>
+                                    <th scope="col" rowspan="2" style="text-align: center;">T (s)</th>
+                                    <th scope="col" rowspan="2" style="text-align: center;">N</th>
+                                    <th scope="col" rowspan="2" style="text-align: center;">U (%)</th>
+                                    <th scope="col" colspan="2" style="text-align: center;">nf</th>
+                                    <th scope="col" colspan="2" style="text-align: center;">tts (s)</th>
+                                    <th scope="col" colspan="2" style="text-align: center;">ic (s)</th>
+                                    <th scope="col" colspan="2" style="text-align: center;">ts (s)</th>
+                                    <th scope="col" colspan="2" style="text-align: center;">tef (s)</th>
+                                    <th scope="col" colspan="2" style="text-align: center;">tps (s)</th>
+                                    <th scope="col" colspan="2" style="text-align: center;">is (s)</th>
+                                    <th scope="col" rowspan="2" style="text-align: center;">p0 (%)</th>
+                                </tr>
+                                <tr>
+                                    <td scope="colgroup">E[nf]</td>
+                                    <td scope="colgroup">σ[nf]</td>
+                                    <td scope="colgroup">E[tts]</td>
+                                    <td scope="colgroup">σ[tts]</td>
+                                    <td scope="colgroup">E[ic]</td>
+                                    <td scope="colgroup">σ[ic]</td>
+                                    <td scope="colgroup">E[ts]</td>
+                                    <td scope="colgroup">σ[ts]</td>
+                                    <td scope="colgroup">E[tef]</td>
+                                    <td scope="colgroup">σ[tef]</td>
+                                    <td scope="colgroup">E[tps]</td>
+                                    <td scope="colgroup">σ[tps]</td>
+                                    <td scope="colgroup">E[is]</td>
+                                    <td scope="colgroup">σ[is]</td>
+                                </tr>
+                            </thead>
+                            <tbody id="queue-results-modal">
+                                
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                        <button type="button" class="btn btn-primary" onclick="update()"
-                            data-dismiss="modal">Salvar</button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Salvar</button>
                 </div>
             </div>
         </div>
@@ -168,83 +247,170 @@
 
     <script>
 
-        //none created started paused
+        //none stoped created started paused
         var state = "none";
         var rsf;
-        function create() {
-            switch (state) {
-                case "none":
-                    document.getElementById("start").disabled = false;
-                    var inputs = document.querySelectorAll(".sf-param")
-                    for (var i = 0; i < inputs.length; i++)
-                        inputs[i].disabled = true;
-                    d3.select("#start").text("iniciar").classed("btn-info", false).classed("btn-success", true);
-                    d3.select("#create").text("parar").classed("btn-danger", true).classed("btn-primary", false)
-                    state = "created"
 
-                    var lambda = parseFloat(document.getElementById("lambda-input").value);
-                    var mis = document.getElementById("mi-input").value.match(/[0-9]+|(\.[0-9]+)|(\[0-9]+.[0-9]+)/g).map(function (d) { return parseFloat(d) });
-                    var r = document.getElementById("router-input").value.match(/[0-9]+|(\.[0-9]+)|(\[0-9]+.[0-9]+)/g).map(function (d) { return parseInt(d) });
+        function create_netqueue() {
+            console.log("create");
+            Queue.counter = 0;
+            Package.counter = 0;
 
-                    rsf = new NetQueue(lambda, mis, r, "g").draw()
+            var lambda = parseFloat(document.getElementById("lambda-input").value);
+            var mis = document.getElementById("mi-input").value.match(/[0-9]+|(\.[0-9]+)|(\[0-9]+.[0-9]+)/g).map(function (d) { return parseFloat(d) });
+            var r = document.getElementById("router-input").value.match(/[0-9]+|(\.[0-9]+)|(\[0-9]+.[0-9]+)/g).map(function (d) { return parseInt(d) });
 
-                    break;
-                default:
-                    document.getElementById("start").disabled = true;
-                    var inputs = document.querySelectorAll(".sf-param")
-                    for (var i = 0; i < inputs.length; i++)
-                        inputs[i].disabled = false;
-                    d3.select("#start").text("iniciar").classed("btn-info", false).classed("btn-success", true);
-                    d3.select("#create").text("criar").classed("btn-danger", false).classed("btn-primary", true)
-                    state = "none";
+            pause_simulation()
 
-                    Queue.count = 0;
-                    Package.count = 0;
+            var g = d3.select(".net-queue").select("g");
+            g.selectAll("g").remove();
+            rsf = new NetQueue(lambda, mis, r, g).draw();
 
-                    if (rsf) {
-                        clearInterval(rsf.animation_call);
-                        rsf.g.selectAll("g").remove();
-                        rsf = null;
+            document.getElementById("start").disabled = false;
+            d3.select("#create").text("criar").classed("btn-danger", false).classed("btn-primary", true)
+            d3.select("#start").text("iniciar").classed("btn-info", false).classed("btn-success", true);
+            state = "created"
+        }
+
+        function simulate() {
+            console.log("simulate");
+
+            if (rsf) {
+                rsf.animation_call = setInterval(() => {
+                    rsf.turn().draw()
+                    if (rsf.n >= n_package) {
+                        rsf.close();
                     }
+                    if (rsf.closed && !rsf.busy()) {
+                        end_simulation()
+                    }
+                }, state_duration + transition_duration)
+
+                d3.select("#start").text("pausar").classed("btn-info", true).classed("btn-success", false);
+                d3.select("#create").text("parar").classed("btn-danger", true).classed("btn-primary", false);
+                var inputs = document.querySelectorAll(".sf-param")
+                for (var i = 0; i < inputs.length; i++)
+                    inputs[i].disabled = true;
+                var inputs = document.querySelectorAll(".animation-param")
+                for (var i = 0; i < inputs.length; i++)
+                    inputs[i].disabled = true;
+                state = "started";
+
+
             }
         }
 
-        function start() {
+        function pause_simulation() {
+            console.log("pause");
+            if (rsf && rsf.animation_call)
+                clearInterval(rsf.animation_call);
+
+            state = "paused";
+
+            d3.select("#start").text("iniciar").classed("btn-info", false).classed("btn-success", true);
+            d3.select("#create").text("parar").classed("btn-danger", true).classed("btn-primary", false);
+            var inputs = document.querySelectorAll(".animation-param")
+            for (var i = 0; i < inputs.length; i++)
+                inputs[i].disabled = false;
+        }
+
+        function stop_simulation() {
+            console.log("stop");
+            Queue.counter = 0;
+            Package.counter = 0;
+
+            var l = rsf.l / time_turn;
+            var m = rsf.m.map((d) => d / time_turn);
+            var r = rsf.r;
+
+            pause_simulation();
+
+            var g = d3.select(".net-queue").select("g");
+            g.selectAll("g").remove();
+            rsf = new NetQueue(l, m, r, g).draw();
+
+            var inputs = document.querySelectorAll("input")
+            for (var i = 0; i < inputs.length; i++)
+                inputs[i].disabled = false;
+
+            d3.select("#create").text("criar").classed("btn-danger", false).classed("btn-primary", true)
+            d3.select("#start").text("iniciar").classed("btn-info", false).classed("btn-success", true);
+            state = "stoped";
+
+        }
+
+        function end_simulation() {
+            var modal = d3.select("#endSimulationModal");
+            modal.select("#nqueue-modal").text(rsf.nqueue);
+            modal.select("#router-modal").text(rsf.router);
+            modal.select("#lambda-modal").text(rsf.λ);
+            modal.select("#imc-modal").text(rsf.imc.toFixed(3));
+
+            var table_param = modal.select("#queue-parameters-modal");
+            table_param.selectAll("tr").remove();
+            table_param.selectAll("tr").data(rsf.queues).enter()
+                .append("tr")
+                .html(function (d, i) {
+                    return `<th scope="col">${i}</th>` +
+                        `<td scope="col">${d.μ} pps</td>` +
+                        `<td scope="col">${d.tms.toFixed(3)} s</td>`
+                })
+
+            var table_results = modal.select("#queue-results-modal");
+            table_results.selectAll("tr").remove();
+            table_results.selectAll("tr").data(rsf.queues).enter()
+                .append("tr")
+                .html(function (d, i) {
+                    return `<th scope="col">${i}</th>` +
+                        `<td scope="col">${d.T.toFixed(3)}</td>` +
+                        `<td scope="col">${d.N}</td>` +
+                        `<td scope="col">${(d.U*100).toFixed(1)}</td>` +
+                        `<td scope="col">${d.E("nf").toFixed(3)}</td>` +
+                        `<td scope="col">${d.σ("nf").toFixed(3)}</td>` +
+                        `<td scope="col">${d.E("tts").toFixed(3)}</td>` +
+                        `<td scope="col">${d.σ("tts").toFixed(3)}</td>` +
+                        `<td scope="col">${d.E("ic").toFixed(3)}</td>` +
+                        `<td scope="col">${d.σ("ic").toFixed(3)}</td>` +
+                        `<td scope="col">${d.E("ts").toFixed(3)}</td>` +
+                        `<td scope="col">${d.σ("ts").toFixed(3)}</td>` +
+                        `<td scope="col">${d.E("tef").toFixed(3)}</td>` +
+                        `<td scope="col">${d.σ("tef").toFixed(3)}</td>` +
+                        `<td scope="col">${d.E("tps").toFixed(3)}</td>` +
+                        `<td scope="col">${d.σ("tps").toFixed(3)}</td>` +
+                        `<td scope="col">${d.E("is").toFixed(3)}</td>` +
+                        `<td scope="col">${d.σ("is").toFixed(3)}</td>` +
+                        `<td scope="col">${(d.p0*100).toFixed(1)}</td>`
+                })
+
+            $('#endSimulationModal').modal('show');
+
+
+            stop_simulation();
+        }
+
+        function btn_create() {
             switch (state) {
-                case "paused": case "created":
-                    if (rsf) {
-                        d3.select("#start").text("pausar").classed("btn-info", true).classed("btn-success", false);
-                        d3.select("#create").text("parar").classed("btn-danger", true).classed("btn-primary", false);
-                        var inputs = document.querySelectorAll(".animation-param")
-                        for (var i = 0; i < inputs.length; i++)
-                            inputs[i].disabled = true;
-                        state = "started";
-
-                        rsf.animation_call = setInterval(() => rsf.turn().draw(), state_duration + transition_duration)
-                    }
-                    break;
-                default:
-                    d3.select("#start").text("iniciar").classed("btn-info", false).classed("btn-success", true);
-                    d3.select("#create").text("parar").classed("btn-danger", true).classed("btn-primary", false);
-                    var inputs = document.querySelectorAll(".animation-param")
-                    for (var i = 0; i < inputs.length; i++)
-                        inputs[i].disabled = false;
-
-                    state = "paused";
-
-                    if (rsf && rsf.animation_call)
-                        clearInterval(rsf.animation_call);
+                case "none": case "stoped": case "created":
+                    create_netqueue(); break;
+                default: stop_simulation();
             }
         }
 
-        function settings() {
+        function btn_start() {
+            switch (state) {
+                case "started": pause_simulation(); break;
+                default: simulate();
+            }
+        }
+
+        function btn_settings() {
             document.getElementById("n-package-input").value = "" + n_package;
             document.getElementById("turn-input").value = "" + time_turn;
             document.getElementById("transition-input").value = "" + transition_duration;
             document.getElementById("interval-input").value = "" + state_duration;
         }
 
-        function update() {
+        function btn_update() {
             n_package = parseFloat(document.getElementById("n-package-input").value);
             time_turn = parseFloat(document.getElementById("turn-input").value);
             transition_duration = parseFloat(document.getElementById("transition-input").value);
@@ -260,7 +426,7 @@
         transition_duration = 2000;
         state_duration = 500;
 
-        settings();
+        btn_settings();
     </script>
 </body>
 

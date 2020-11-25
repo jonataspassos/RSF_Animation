@@ -92,8 +92,6 @@ class EDP {
     }
 }
 
-var
-
 function X(p) {
     var u = (Math.random() + 1.0) / (3.0); // u in (0,1)
     return -p * Math.log(u);
@@ -184,7 +182,7 @@ class Queue {
 
         //Parametros de processamento da fila
         this.m = m * time_turn;//mi em turnos
-        this.tms = this.m ? 1 / this.m : -1;//tms em turnos -1 infinito
+        this.tms_turn = this.m ? 1 / this.m : -1;//tms em turnos -1 infinito
 
         //Lista de pacotes na fila
         this.pack_queue = [];
@@ -205,11 +203,11 @@ class Queue {
             tts: new EDP(),
             nf: new EDP(),
             is: new EDP(),
-            U: new EDP(),
-            tps: this.ts,
-            p0: function () { return 1 - this.U.μ; }//ok
-            T: function () { return }
+            U: new EDP()
         };
+        this.statistics.tps = this.statistics.ts;
+
+        this.turned = -1;
 
         return this;
     }
@@ -224,25 +222,26 @@ class Queue {
         });
     }
     turn(time, next) { // gerencia a movimentação dos pacotes dentro do sistema de fila
+
         if (next) {
             next.g.classed(`p-queue-${this.id}`, true);
             this.pack_queue.push(next);//entra na fila
             next.nf.push(this.pack_queue.length - 1);//Salva quantos pacotes tinha na fila quando o pacote chegou;
 
             this.statistics.nf.insert(this.pack_queue.length - 1);
-            this.statistics.ic.insert(time - this.log[this.log.length - 1].tcf);
+            if (this.log.length)
+                this.statistics.ic.insert(time - this.log[this.log.length - 1].tcf);
         }
         if (this.m && (!this.server_pack || time >= this.server_pack.timeoutserver)) {
             var ret = this.server_pack;
-
-            //this.server_pack.update = true;
             this.server_pack = null;
+
             if (this.pack_queue.length != 0) {// Fila não vazia, 
                 this.server_pack = this.pack_queue[0];//pega o primeiro da fila
                 this.pack_queue = this.pack_queue.slice(1);//atualiza a fila
 
                 //Calcula a duração do pacote no servidor
-                var ts = this.tms == -1 ? -1 : Math.ceil(X(this.tms));
+                var ts = this.tms_turn == -1 ? -1 : Math.ceil(X(this.tms_turn));
                 this.server_pack.duration.push(ts);
                 //Marca o tempo de entrada
                 this.server_pack.router.push(time);
@@ -260,17 +259,18 @@ class Queue {
             }
             if (ret) {
                 //Intervalo entre saídas
-                this.statistics.is.insert(time - this.log[this.log.length - 1].tfs);
+                if (this.log.length)
+                    this.statistics.is.insert(time - this.log[this.log.length - 1].tfs);
                 //Logs do sistema de fila
                 this.log.push({
                     nf: ret.getNf(),
                     ic: (ret.r - 1 ? ret.router[ret.r - 2] + ret.duration[ret.r - 2] : ret.start)
-                        - this.log[this.log.length - 1].tcf,
+                        - (this.log.length ? this.log[this.log.length - 1].tcf : 0),
                     ts: ret.duration[ret.r - 1],
                     tcf: ret.r - 1 ? ret.router[ret.r - 2] + ret.duration[ret.r - 2] : ret.start,
                     tis: ret.router[ret.r - 1],
                     tfs: time,
-                    is: time - this.log[this.log.length - 1].tfs
+                    is: time - (this.log.length ? this.log[this.log.length - 1].tfs : 0)
                 })
 
 
@@ -278,14 +278,25 @@ class Queue {
                 ret.g.classed(`server-${this.id}`, false);
             }
 
+            if (time > this.turned) {
+                this.statistics.U.insert(this.server_pack == null ? 0 : 1);
+            }
 
+            this.turned = time;
 
             return ret;
         }
 
-        this.statistics.U.insert(this.server_pack ? 1 : 0);
+        if (time > this.turned) {
+            this.statistics.U.insert(this.server_pack == null ? 0 : 1);
+        }
+
+        this.turned = time;
 
         return null;
+    }
+    busy() {
+        return this.pack_queue.length > 0 || this.server_pack != null;
     }
     draw() {
         this.g.selectAll("circle").data([null]).enter().append("circle");
@@ -294,6 +305,36 @@ class Queue {
         this.g.selectAll("path").data([null]).enter().append("path");
         this.g.select("path").attr("d", "M 0 0 L 90 0 90 60 0 60 0 55 85 55 85 5 0 5 z").attr("fill", "#333");
         return this;
+    }
+    get μ() {
+        return this.m / time_turn;
+    }
+    get tms() {
+        return 1 / this.μ;
+    }
+    get T() {
+        var last = this.log[this.log.length - 1];
+        var first = this.log[0];
+        return (last.tfs - first.tcf) * time_turn;
+    }
+    get N() {
+        return this.log.length;
+    }
+    get U() {
+        return this.statistics.U.μ;
+    }
+    get p0() {
+        return 1 - this.statistics.U.μ;
+    }
+    E(v) {
+        if (v == "nf" || v == "U")
+            return this.statistics[v].E
+        return this.statistics[v].E * time_turn
+    }
+    σ(v) {
+        if (v == "nf" || v == "U")
+            return this.statistics[v].σ
+        return this.statistics[v].σ * time_turn
     }
 }
 
@@ -308,12 +349,13 @@ class NetQueue {
         else
             this.g = g_element;
 
-        this.g.classed("netqueue", true).classed(`netqueue-${this.id}`, true);
+        this.g.attr("class", `netqueue netqueue-${this.id}`);
 
         //Parâmetros de entrada de pacotes
         this.l = l * time_turn;//lambda em turnos
-        this.imc = this.l ? 1 / this.l : -1; // -1 infinito
+        this.imc_turn = this.l ? 1 / this.l : -1; // -1 infinito
         this.n = 0; // Numero de pacotes que passaram pelo sistema
+        this.m = m;
 
         //Roteamento
         this.r = r;
@@ -351,6 +393,7 @@ class NetQueue {
 
         this.time = 0;
         this.create_next = 0;
+        this.closed = false;
 
         if (this.l <= 0) {
             alert("Este sistema de fila possui entrada inválida. Insira um valor de λ maior que 0.")
@@ -368,6 +411,35 @@ class NetQueue {
 
         return this;
     }
+    get nqueue() {
+        return this.queues.length;
+    }
+    get λ() {
+        return this.l / time_turn;
+    }
+    get imc() {
+        return 1 / this.λ
+    }
+    get router() {
+        return this.r.map(function (d, i, r) {
+            return `${d}-${r[i + 1]}`
+        }).slice(0, this.r.length - 1).join("; ");
+    }
+    busy() {
+        var ret = false;
+
+        if (this.next || this.out)
+            return true;
+
+        for (var i = 0; i < this.queues.length; i++) {
+            ret = ret || this.queues[i].busy();
+        }
+
+        return ret;
+    }
+    close() {
+        this.closed = true;
+    }
     turn() { // Gerencia a entrada e saída de pacotes de cada sistema de fila
         for (var i = this.queues.length - 1; i >= 0; i--) {
             this.next = this.queues[i].turn(this.time);
@@ -381,14 +453,14 @@ class NetQueue {
             }
         }
 
-        if (this.l && this.time >= this.create_next) {
+        if (!this.closed && this.l && this.time >= this.create_next) {
             this.next = new Package(this.time, this.g.select(".packages").append("g")).draw();
             this.next.n = this.n++;
             this.next.g.classed("pack-start", true);
 
             this.queues[this.r[0]].turn(this.time, this.next);
 
-            this.create_next = this.imc == -1 ? -1 : this.time + Math.ceil(X(this.imc));
+            this.create_next = this.imc_turn == -1 ? -1 : this.time + Math.ceil(X(this.imc_turn));
         }
 
         this.time++;
@@ -506,6 +578,7 @@ class NetQueue {
             }
         }
 
+        //Out Net System
         var out_p = this.g.select(`.pack-end`)
         if (!out_p.empty()) {
             var last = {
@@ -540,6 +613,9 @@ class NetQueue {
                 .delay(transition_duration * (transition_in + transition_step1 + transition_step2 + transition_step3))
                 .duration(transition_duration * transition_in)
                 .attr("d", "M 75 25 L 75 75 100 50");
+
+            var a = this;
+            setTimeout(() => { this.out = null; }, transition_duration + 10);
 
         }
 
