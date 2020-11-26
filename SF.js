@@ -65,6 +65,34 @@ function range(n, max, step) {
     return ret;
 }
 
+/**
+	 * This function returns these informations of tag:
+	 * x - absolute x in window; 
+	 * y - absolute y in window; 
+	 * width or w - width of tag area;
+	 * height or h - hright of tag area;
+	 * left or l - distance of tag to left limit of window;
+	 * right or r - distance of tag to right limit of window;
+	 * top or t - distance of tag to top limit of window;
+	 * bottom or b - distance of tag to bottom limit of window;
+	 * @param {String} selector The expression to locate tag;
+	 * @returns {Object} infomations about tag area (empty if tag is not found)
+	 */
+function size_info(selector) {
+    var tag = document.querySelector(selector);
+    if (tag) {
+        var b = tag.getBoundingClientRect();
+        b.w = b.width,
+            b.h = b.height,
+            b.l = b.left,
+            b.r = b.right,
+            b.t = b.top,
+            b.b = b.bottom;
+        return b;
+    }
+    return {};
+}
+
 class EDP {
     constructor() {
         this.__s_xi = 0;
@@ -383,6 +411,8 @@ class NetQueue {
     constructor(l, m, r, g_element) {
         this.id = NetQueue.counter++;
 
+        this.scale_transform = "";
+
         //Container gráfico
         if (typeof g_element == "string")
             this.g = d3.select(g_element);
@@ -413,7 +443,7 @@ class NetQueue {
         this.queues[r[0]].x_index = 0;
         this.queues[r[0]].y_index = 0;
         var x_index = [1];
-        this.n_row = 0;
+        this.n_row = 1;
         for (var i = 1; i < r.length; i++) {
             if (this.queues[r[i]].x_index == undefined) {
                 this.queues[r[i]].x_index = this.queues[r[i - 1]].x_index + 1;
@@ -532,6 +562,15 @@ class NetQueue {
             transition_step3 = 0.15,
             transition_in = 0.25;
 
+        //Redimensionando sistema
+        var info = {
+            w: 100 + horizontal_padding + this.n_col * (150 + horizontal_padding),
+            h: vertical_out + 150
+        };
+        var s = 1200 / info.w;
+        s = s > 600 / info.h ? 600 / info.h : s;
+        this.scale_transform = `scale(${s},${s})`
+
         // Start Draw Net Queue
         this.input.selectAll("path").data(["M 50 0 L 75 25 75 75 50 100 0 50 z",
             "M 75 25 L 75 75 100 50"])
@@ -541,7 +580,7 @@ class NetQueue {
         this.input.selectAll("text").data([null]).enter().append("text")
             .attr("text-anchor", "middle")
             .attr("x", 50).text("IN")
-            .attr("y", 50).attr("fill","white").attr("font-size",23)
+            .attr("y", 50).attr("fill", "white").attr("font-size", 23)
             .attr("dy", "0.4em");
 
         this.output.selectAll("path").data(["M 50 0 L 75 25 75 75 50 100 0 50 z",
@@ -552,7 +591,7 @@ class NetQueue {
         this.output.selectAll("text").data([null]).enter().append("text")
             .attr("text-anchor", "middle")
             .attr("x", 50).text("OUT")
-            .attr("y", 50).attr("fill","white").attr("font-size",23)
+            .attr("y", 50).attr("fill", "white").attr("font-size", 23)
             .attr("dy", "0.4em");
 
         this.input.attr("transform", `translate(0,${vertical_padding - 20})`)
