@@ -13,16 +13,24 @@ function deep_copy(object) {
     return JSON.parse(JSON.stringify(object));
 }
 
+var colors = ["#F49E4C", "#70D6FF", "#8E4A49", "#38726C",
+    "#F5EE9E", "#A075A0", "#70A3FF", "#FF7070",
+    "#8DC7C1", "#E4D318", "#472524", "#B8EBFF",
+    "#F44B78", "#4BF488", "#F6F0AA", "#4B63F4",
+    "#8E4848", "#70FF86", "#F49CF1", "#4B63F4",
+]
+
+
 function downloadFile(content, filename) {
     var supportsDownloadAttribute = 'download' in document.createElement('a');
 
     if (supportsDownloadAttribute) {
         var link = d3.select("body").append("a")
             .attr("href", 'data:attachment/csv;base64,' + encodeURI(window.btoa(content)))
-            .attr("target",'_blank')
-            .attr("download",filename)
+            .attr("target", '_blank')
+            .attr("download", filename)
         link._groups[0][0].click()
-        
+
         setTimeout(function () {
             link.remove();
         }, 50);
@@ -120,6 +128,7 @@ function X(p) {
 
 class Package {
     static counter = 0;
+    static color = d3.scaleOrdinal().domain(range(20)).range(colors);
     constructor(start, g_element) {
         this.id = Package.counter++;
 
@@ -172,7 +181,12 @@ class Package {
 
     draw() {
         this.g.selectAll("rect").data([null]).enter().append("rect");
-        this.g.select("rect").attr("width", 40).attr("height", 40).attr("fill", "#3A3");
+        this.g.select("rect")
+            .attr("width", 40)
+            .attr("height", 40)
+            .attr("fill", Package.color(this.id % 20))
+            .attr("stroke-width", 1)
+            .attr("stroke", "#000")
         return this;
     }
 }
@@ -321,11 +335,15 @@ class Queue {
         return this.pack_queue.length > 0 || this.server_pack != null;
     }
     draw() {
-        this.g.selectAll("circle").data([null]).enter().append("circle");
-        this.g.select("circle").attr("r", 35).attr("cy", 30).attr("cx", 120).attr("fill", "#33A");
+        this.g.selectAll("circle").data([null]).enter().append("circle")
+            .attr("fill", "#218838")
+            .attr("stroke", "#333")
+            .attr("stroke-width", 3);
+        this.g.select("circle").attr("r", 33).attr("cy", 30).attr("cx", 120);
 
         this.g.selectAll("path").data([null]).enter().append("path");
-        this.g.select("path").attr("d", "M 0 0 L 90 0 90 60 0 60 0 55 85 55 85 5 0 5 z").attr("fill", "#333");
+        this.g.select("path").attr("d", "M 0 0 L 90 0 90 60 0 60 0 55 85 55 85 5 0 5 z")
+            .attr("fill", "#333");
         return this;
     }
     get μ() {
@@ -395,6 +413,7 @@ class NetQueue {
         this.queues[r[0]].x_index = 0;
         this.queues[r[0]].y_index = 0;
         var x_index = [1];
+        this.n_row = 0;
         for (var i = 1; i < r.length; i++) {
             if (this.queues[r[i]].x_index == undefined) {
                 this.queues[r[i]].x_index = this.queues[r[i - 1]].x_index + 1;
@@ -404,9 +423,11 @@ class NetQueue {
                     x_index[this.queues[r[i]].x_index]++;
                 }
                 this.queues[r[i]].y_index = x_index[this.queues[r[i]].x_index] - 1;
+                this.n_row = this.queues[r[i]].y_index + 1 < this.n_row ? this.n_row : this.queues[r[i]].y_index + 1;
             }
         }
         this.n_col = x_index.length;
+
 
         this.out = null;
 
@@ -502,7 +523,8 @@ class NetQueue {
     }
     draw() {
         var horizontal_padding = 80,
-            vertical_padding = 60;
+            vertical_padding = 80,
+            vertical_out = vertical_padding + (vertical_padding + 60) * this.n_row;
 
         var transition_out = 0.25,
             transition_step1 = 0.15,
@@ -514,18 +536,30 @@ class NetQueue {
         this.input.selectAll("path").data(["M 50 0 L 75 25 75 75 50 100 0 50 z",
             "M 75 25 L 75 75 100 50"])
             .enter().append("path").attr("class", function (d, i) { return i ? "door" : "base" })
-            .attr("d", function (d) { return d });
+            .attr("d", function (d) { return d })
+            .attr("fill", "#0069d9");
+        this.input.selectAll("text").data([null]).enter().append("text")
+            .attr("text-anchor", "middle")
+            .attr("x", 50).text("IN")
+            .attr("y", 50).attr("fill","white").attr("font-size",23)
+            .attr("dy", "0.4em");
 
         this.output.selectAll("path").data(["M 50 0 L 75 25 75 75 50 100 0 50 z",
             "M 75 25 L 75 75 100 50"])
             .enter().append("path").attr("class", function (d, i) { return i ? "door" : "base" })
-            .attr("d", function (d) { return d });
+            .attr("d", function (d) { return d })
+            .attr("fill", "#0069d9");
+        this.output.selectAll("text").data([null]).enter().append("text")
+            .attr("text-anchor", "middle")
+            .attr("x", 50).text("OUT")
+            .attr("y", 50).attr("fill","white").attr("font-size",23)
+            .attr("dy", "0.4em");
 
         this.input.attr("transform", `translate(0,${vertical_padding - 20})`)
-        this.output.attr("transform", `translate(0,${2 * vertical_padding + 60 - 20})`);
+        this.output.attr("transform", `translate(0,${vertical_out - 20})`);
 
         // New Package
-        var p_next = this.g.select(".pack-start")
+        var p_next = this.g.select(".pack-start");
         if (!p_next.empty()) {
             p_next
                 .attr("transform", `translate(25,${vertical_padding + 10})`);
@@ -567,7 +601,9 @@ class NetQueue {
                     y: vertical_padding + this.queues[this.r[i + 1]].y_index *
                         (vertical_padding + 60) + 10
                 }
-
+                this.queues[this.r[i]].g.select("circle").transition()
+                    .duration(transition_duration * transition_in)
+                    .attr("fill", "#218838");
                 if (last.y == now.y && last.x == now.x) {
                     out_p.transition()
                         .duration(transition_duration * (transition_in + transition_step1 + transition_step2 + transition_step3))
@@ -619,12 +655,12 @@ class NetQueue {
             out_p.transition()
                 .delay(transition_duration * transition_in)
                 .duration(transition_duration * (transition_step1))
-                .attr("transform", `translate(${last.x},${2 * vertical_padding + 60 + 10})`);
+                .attr("transform", `translate(${last.x},${vertical_out + 10})`);
 
             out_p.transition()
                 .delay(transition_duration * (transition_in + transition_step1))
                 .duration(transition_duration * (transition_step2 + transition_step3))
-                .attr("transform", `translate(${25},${2 * vertical_padding + 60 + 10})`).remove();
+                .attr("transform", `translate(${25},${vertical_out + 10})`).remove();
 
             this.output.select(".door").transition()
                 .delay(transition_duration * (transition_in + transition_step1))
@@ -659,10 +695,17 @@ class NetQueue {
                 .duration(transition_duration * transition_in)
                 .attr("transform", function (d, i) { return `translate(${x_axis(d.queue_ord)},${y_pack})scale(${scale_x},1)` })
 
-            this.g.select(`.server-${this.queues[i].id}`).transition()
-                .delay(transition_duration * (transition_in + transition_step1 + transition_step2 + transition_step3))
+            var server = this.g.select(`.server-${this.queues[i].id}`).transition()
+                .delay(transition_duration * (transition_out + transition_step1 + transition_step2 + transition_step3))
                 .duration(transition_duration * transition_in)
                 .attr("transform", `translate(${x + 100},${y_pack})scale(1,1)`);
+
+            if (!server.empty())
+                this.queues[i].g.select("circle").transition()
+                    .delay(transition_duration * (transition_out + transition_step1 + transition_step2 + transition_step3))
+                    .duration(transition_duration * transition_in)
+                    .attr("fill", "#dc3545");
+
         }
         return this;
     }

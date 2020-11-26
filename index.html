@@ -2,6 +2,7 @@
 <html lang="pt-br">
 
 <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
     <!-- Libs in Web -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
@@ -86,17 +87,64 @@
 
     <div class="body-system">
         <div class="row justify-content-md-center">
-            <div class="col col-lg-10">
-                <svg class="net-queue" width="100%" height="500px">
+            <div class="col col-lg-10" style="background-color:#DBF5FF">
+                <svg class="net-queue" width="100%" height="600px" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <filter id="shadow" x="0" y="0" width="200%" height="200%">
                             <feOffset result="offOut" in="SourceGraphic" dx="5" dy="5" />
                             <feGaussianBlur result="blurOut" in="offOut" stdDeviation="10" />
                             <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
                         </filter>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="-1%" style="stop-color:#DBF5FF;stop-opacity:0" />
+                            <stop offset="5%" style="stop-color:#DBF5FF;stop-opacity:0.8" />
+                        </linearGradient>
                     </defs>
 
                     <g class="net-queue"></g>
+                    <g class="legend" transform="translate(10,585)" fill="#138496">
+                        <rect width="200px" height="210px" y="-10" fill="url(#grad1)"></rect>
+                        <text x="20px" dy="0.3em">Legenda:</text>
+                        <path d="M 15 0 L 0 0 0 200 200 200 200 0 190 0 M 170 0 90 0" stroke="#138496"
+                            stroke-width="2px" fill="none"></path>
+                        <g class="minimizer btn btn-primary" transform="translate(170,-10)" onclick="legend()">
+                            <rect width="20px" height="20px" style="opacity:0;"></rect>
+                            <path d="M 4 12 L 10 4 16 12"></path>
+                        </g>
+                        <g transform="translate(15,25)">
+                            <rect x="15" width="30px" height="30px" stroke="#138496" stroke-width="1px" fill="none">
+                            </rect>
+                            <rect width="8px" height="2px" x="80px" y="14px"></rect>
+                            <text x="100px" y="14px" dy="0.4em">Pacote</text>
+                        </g>
+                        <g transform="translate(15,70)">
+                            <g>
+                                <path d="M 0 0 L 35 0 35 30 0 30" stroke="#138496" stroke-width="1px" fill="none">
+                                </path>
+                                <circle r=15 cx="50" cy="15" stroke="#138496" stroke-width="1px" fill="none"></circle>
+                            </g>
+
+                            <rect width="8px" height="2px" x="80px" y="14px"></rect>
+                            <text x="100px" y="7px" dy="0.4em">Sistema</text>
+                            <text x="100px" y="21px" dy="0.4em">de Fila</text>
+                        </g>
+                        <g transform="translate(15,115)">
+                            <g transform="translate(11,0)">
+                                <path d="M 20 0 L 40 20 20 40 0 20z" stroke="#138496" stroke-width="1px" fill="none">
+                                </path>
+                            </g>
+                            <rect width="8px" height="2px" x="80px" y="20px"></rect>
+                            <text x="100px" y="13px" dy="0.4em">Entrada</text>
+                            <text x="100px" y="27px" dy="0.4em">ou Saída</text>
+                        </g>
+                        <g transform="translate(15,165)">
+                            <line x1="15" y1="25" x2="55" y2="5" stroke="#138496" stroke-width="4px"
+                                stroke-dasharray="5"></line>
+                            <rect width="8px" height="2px" x="80px" y="14px"></rect>
+                            <text x="100px" y="14px" dy="0.4em">Rota</text>
+                        </g>
+                    </g>
+                    <g class="interaction"></g>
                 </svg>
             </div>
         </div>
@@ -507,7 +555,7 @@
             var sep = ";";
             var line = "\n";
             str = ["id", "queue", "nf", "ic", "ts", "tcf", "tis", "tfs", "is"].join(sep)
-                 + line
+                + line
                 + rsf.queues.map((d, i) => {
                     return d.log.map((e) => {
                         return [e.id, i, e.nf, e.ic, e.ts, e.tcf, e.tis, e.tfs, e.is]
@@ -546,6 +594,14 @@
             state_duration = parseFloat(document.getElementById("interval-input").value);
         }
 
+        var legend_status = false
+        function legend() {
+            legend_status = !legend_status;
+            d3.select(".legend").transition().duration(500)
+                .attr("transform", `translate(10,${legend_status ? 390 : 585})`)
+                .select(".minimizer").select("path").attr("d", legend_status ? "M 4 8 L 10 16 16 8" : "M 4 12 L 10 4 16 12")
+        }
+
         document.getElementById("lambda-input").value = "200";
         document.getElementById("mi-input").value = "500, 950, 250, 250";
         document.getElementById("router-input").value = "0, 1, 2, 1, 3, 1, 0"
@@ -556,6 +612,9 @@
         state_duration = 500;
 
         btn_settings();
+
+
+
     </script>
 </body>
 
