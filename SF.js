@@ -389,7 +389,7 @@ class NetQueue {
         else
             this.g = g_element;
 
-        this.g.attr("class", `netqueue netqueue-${this.id}`);
+        this.g.attr("class", `net-queue net-queue-${this.id}`);
 
         //Parâmetros de entrada de pacotes
         this.l = l * time_turn;//lambda em turnos
