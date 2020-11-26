@@ -576,7 +576,9 @@ class NetQueue {
             "M 75 25 L 75 75 100 50"])
             .enter().append("path").attr("class", function (d, i) { return i ? "door" : "base" })
             .attr("d", function (d) { return d })
-            .attr("fill", "#0069d9");
+            .attr("fill", "#0069d9")
+            .attr("stroke","#0069d9")
+            .attr("stroke-width",1);
         this.input.selectAll("text").data([null]).enter().append("text")
             .attr("text-anchor", "middle")
             .attr("x", 50).text("IN")
@@ -587,7 +589,9 @@ class NetQueue {
             "M 75 25 L 75 75 100 50"])
             .enter().append("path").attr("class", function (d, i) { return i ? "door" : "base" })
             .attr("d", function (d) { return d })
-            .attr("fill", "#0069d9");
+            .attr("fill", "#0069d9")
+            .attr("stroke","#0069d9")
+            .attr("stroke-width",1);
         this.output.selectAll("text").data([null]).enter().append("text")
             .attr("text-anchor", "middle")
             .attr("x", 50).text("OUT")

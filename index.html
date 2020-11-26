@@ -120,52 +120,65 @@
                             <g class="net-queue" transform="translate(0,0)"></g>
                         </g>
                     </g>
-                    <g class="legend" transform="translate(10,585)" fill="#138496">
-                        <rect width="200px" height="210px" y="-10" fill="url(#grad1)"></rect>
-                        <text x="20px" dy="0.3em">Legenda:</text>
-                        <path d="M 15 0 L 0 0 0 200 200 200 200 0 190 0 M 170 0 90 0" stroke="#138496"
-                            stroke-width="2px" fill="none"></path>
-                        <g transform="translate(170,-10)" class=" minimizer btn btn-primary" onclick="btn_legend()">
-                            <rect width="20px" height="20px" style="opacity:0;"></rect>
-                            <path d="M 4 12 L 10 4 16 12"></path>
-                        </g>
-                        <g transform="translate(15,25)">
-                            <rect x="15" width="30px" height="30px" stroke="#138496" stroke-width="1px" fill="none">
-                            </rect>
-                            <rect width="8px" height="2px" x="80px" y="14px"></rect>
-                            <text x="100px" y="14px" dy="0.4em">Pacote</text>
-                        </g>
-                        <g transform="translate(15,70)">
-                            <g>
-                                <path d="M 0 0 L 35 0 35 30 0 30" stroke="#138496" stroke-width="1px" fill="none">
-                                </path>
-                                <circle r=15 cx="50" cy="15" stroke="#138496" stroke-width="1px" fill="none"></circle>
-                            </g>
 
-                            <rect width="8px" height="2px" x="80px" y="14px"></rect>
-                            <text x="100px" y="7px" dy="0.4em">Sistema</text>
-                            <text x="100px" y="21px" dy="0.4em">de Fila</text>
-                        </g>
-                        <g transform="translate(15,115)">
-                            <g transform="translate(11,0)">
-                                <path d="M 20 0 L 40 20 20 40 0 20z" stroke="#138496" stroke-width="1px" fill="none">
-                                </path>
+                    <!-- Barra de baixo -->
+                    <g transform="translate(0,600)">
+                        <!-- Legenda -->
+                        <g class="legend" transform="translate(10,-15)" fill="#138496">
+                            <rect width="200px" height="210px" y="-10" fill="url(#grad1)"></rect>
+                            <text x="20px" dy="0.3em">Legenda:</text>
+                            <path d="M 15 0 L 0 0 0 200 200 200 200 0 190 0 M 170 0 90 0" stroke="#138496"
+                                stroke-width="2px" fill="none"></path>
+                            <g transform="translate(170,-10)" class=" minimizer btn btn-primary" onclick="btn_legend()">
+                                <rect width="20px" height="20px" style="opacity:0;"></rect>
+                                <path d="M 4 12 L 10 4 16 12"></path>
                             </g>
-                            <rect width="8px" height="2px" x="80px" y="20px"></rect>
-                            <text x="100px" y="13px" dy="0.4em">Entrada</text>
-                            <text x="100px" y="27px" dy="0.4em">ou Saída</text>
+                            <g transform="translate(15,25)">
+                                <rect x="15" width="30px" height="30px" stroke="#138496" stroke-width="1px" fill="none">
+                                </rect>
+                                <rect width="8px" height="2px" x="80px" y="14px"></rect>
+                                <text x="100px" y="14px" dy="0.4em">Pacote</text>
+                            </g>
+                            <g transform="translate(15,70)">
+                                <g>
+                                    <path d="M 0 0 L 35 0 35 30 0 30" stroke="#138496" stroke-width="1px" fill="none">
+                                    </path>
+                                    <circle r=15 cx="50" cy="15" stroke="#138496" stroke-width="1px" fill="none">
+                                    </circle>
+                                </g>
+
+                                <rect width="8px" height="2px" x="80px" y="14px"></rect>
+                                <text x="100px" y="7px" dy="0.4em">Sistema</text>
+                                <text x="100px" y="21px" dy="0.4em">de Fila</text>
+                            </g>
+                            <g transform="translate(15,115)">
+                                <g transform="translate(11,0)">
+                                    <path d="M 20 0 L 40 20 20 40 0 20z" stroke="#138496" stroke-width="1px"
+                                        fill="none">
+                                    </path>
+                                </g>
+                                <rect width="8px" height="2px" x="80px" y="20px"></rect>
+                                <text x="100px" y="13px" dy="0.4em">Entrada</text>
+                                <text x="100px" y="27px" dy="0.4em">ou Saída</text>
+                            </g>
+                            <g transform="translate(15,165)">
+                                <line x1="15" y1="25" x2="55" y2="5" stroke="#138496" stroke-width="4px"
+                                    stroke-dasharray="5"></line>
+                                <rect width="8px" height="2px" x="80px" y="14px"></rect>
+                                <text x="100px" y="14px" dy="0.4em">Rota</text>
+                            </g>
                         </g>
-                        <g transform="translate(15,165)">
-                            <line x1="15" y1="25" x2="55" y2="5" stroke="#138496" stroke-width="4px"
-                                stroke-dasharray="5"></line>
-                            <rect width="8px" height="2px" x="80px" y="14px"></rect>
-                            <text x="100px" y="14px" dy="0.4em">Rota</text>
-                        </g>
+                        <!-- Interações -->
+                        <g class="interaction"></g>
                     </g>
+
+                    <!-- Barra de Cima -->
                     <g>
                         <rect width="1200" height="36" fill="url(#grad2)"></rect>
 
+                        <!-- Cronômetro -->
                         <g class="stopwatch"></g>
+                        <!-- Controle de Zoom -->
                         <g class="zoom-control" transform="translate(1090,10)">
                             <g id="reset-zoom" class="btn btn-primary" onclick="btn_resetzoom()">
                                 <rect x=-2 y=-2 width=20 height=20 style="opacity:0"></rect>
@@ -207,7 +220,7 @@
 
                         </g>
                     </g>
-                    <g class="interaction"></g>
+
                 </svg>
             </div>
         </div>
@@ -482,337 +495,7 @@
         </div>
     </div>
 
-    <script>
-
-        //none stoped created started paused
-        var state = "none";
-        var rsf;
-
-        //Simulation
-        function create_netqueue() {
-            Queue.counter = 0;
-            Package.counter = 0;
-
-            var lambda = parseFloat(document.getElementById("lambda-input").value);
-            var mis = document.getElementById("mi-input").value.match(/[0-9]+|(\.[0-9]+)|(\[0-9]+.[0-9]+)/g).map(function (d) { return parseFloat(d) });
-            var r = document.getElementById("router-input").value.match(/[0-9]+|(\.[0-9]+)|(\[0-9]+.[0-9]+)/g).map(function (d) { return parseInt(d) });
-
-            pause_simulation()
-
-            var g = d3.select(".net-queue");
-            g.selectAll("g").remove();
-            rsf = new NetQueue(lambda, mis, r, g).draw();
-            g.attr("transform", `translate(${m.rx},${m.ry})${rsf.scale_transform}`)
-
-
-            document.getElementById("start").disabled = false;
-            d3.select("#create").text("criar").classed("btn-danger", false).classed("btn-primary", true)
-            d3.select("#start").text("iniciar").classed("btn-info", false).classed("btn-success", true);
-            state = "created"
-        }
-        function simulate() {
-            if (rsf) {
-                rsf.animation_call = setInterval(() => {
-                    rsf.turn().draw()
-                    if (rsf.n >= n_package) {
-                        rsf.close();
-                    }
-                    if (rsf.closed && !rsf.busy()) {
-                        end_simulation()
-                    }
-                }, state_duration + transition_duration)
-
-                d3.select("#start").text("pausar").classed("btn-info", true).classed("btn-success", false);
-                d3.select("#create").text("parar").classed("btn-danger", true).classed("btn-primary", false);
-                var inputs = document.querySelectorAll(".sf-param")
-                for (var i = 0; i < inputs.length; i++)
-                    inputs[i].disabled = true;
-                var inputs = document.querySelectorAll(".animation-param")
-                for (var i = 0; i < inputs.length; i++)
-                    inputs[i].disabled = true;
-                state = "started";
-
-
-            }
-        }
-        function pause_simulation() {
-            if (rsf && rsf.animation_call)
-                clearInterval(rsf.animation_call);
-
-            state = "paused";
-
-            d3.select("#start").text("iniciar").classed("btn-info", false).classed("btn-success", true);
-            d3.select("#create").text("parar").classed("btn-danger", true).classed("btn-primary", false);
-            var inputs = document.querySelectorAll(".animation-param")
-            for (var i = 0; i < inputs.length; i++)
-                inputs[i].disabled = false;
-        }
-        function stop_simulation() {
-            Queue.counter = 0;
-            Package.counter = 0;
-
-            var l = rsf.l / time_turn;
-            var m = rsf.m.map((d) => d / time_turn);
-            var r = rsf.r;
-
-            pause_simulation();
-
-            var g = d3.select(".net-queue");
-            g.selectAll("g").remove();
-            rsf = new NetQueue(l, m, r, g).draw();
-            
-
-            var inputs = document.querySelectorAll("input")
-            for (var i = 0; i < inputs.length; i++)
-                inputs[i].disabled = false;
-
-            d3.select("#create").text("criar").classed("btn-danger", false).classed("btn-primary", true)
-            d3.select("#start").text("iniciar").classed("btn-info", false).classed("btn-success", true);
-            state = "stoped";
-
-        }
-        function end_simulation() {
-            pause_simulation();
-
-            var modal = d3.select("#endSimulationModal");
-            modal.select("#nqueue-modal").text(rsf.nqueue);
-            modal.select("#router-modal").text(rsf.router);
-            modal.select("#lambda-modal").text(rsf.λ);
-            modal.select("#imc-modal").text(rsf.imc.toFixed(3));
-
-            var table_param = modal.select("#queue-parameters-modal");
-            table_param.selectAll("tr").remove();
-            table_param.selectAll("tr").data(rsf.queues).enter()
-                .append("tr")
-                .html(function (d, i) {
-                    return `<th scope="col">${i}</th>` +
-                        `<td scope="col">${d.μ} pps</td>` +
-                        `<td scope="col">${d.tms.toFixed(3)} s</td>`
-                })
-
-            var table_results = modal.select("#queue-results-modal");
-            table_results.selectAll("tr").remove();
-            table_results.selectAll("tr").data(rsf.queues).enter()
-                .append("tr")
-                .html(function (d, i) {
-                    return `<th scope="col">${i}</th>` +
-                        `<td scope="col">${d.T.toFixed(3)}</td>` +
-                        `<td scope="col">${d.N}</td>` +
-                        `<td scope="col">${(d.U * 100).toFixed(1)}</td>` +
-                        `<td scope="col">${d.E("nf").toFixed(3)}</td>` +
-                        `<td scope="col">${d.σ("nf").toFixed(3)}</td>` +
-                        `<td scope="col">${d.E("tts").toFixed(3)}</td>` +
-                        `<td scope="col">${d.σ("tts").toFixed(3)}</td>` +
-                        `<td scope="col">${d.E("ic").toFixed(3)}</td>` +
-                        `<td scope="col">${d.σ("ic").toFixed(3)}</td>` +
-                        `<td scope="col">${d.E("ts").toFixed(3)}</td>` +
-                        `<td scope="col">${d.σ("ts").toFixed(3)}</td>` +
-                        `<td scope="col">${d.E("tef").toFixed(3)}</td>` +
-                        `<td scope="col">${d.σ("tef").toFixed(3)}</td>` +
-                        `<td scope="col">${d.E("tps").toFixed(3)}</td>` +
-                        `<td scope="col">${d.σ("tps").toFixed(3)}</td>` +
-                        `<td scope="col">${d.E("is").toFixed(3)}</td>` +
-                        `<td scope="col">${d.σ("is").toFixed(3)}</td>` +
-                        `<td scope="col">${(d.p0 * 100).toFixed(1)}</td>`
-                })
-
-            $('#endSimulationModal').modal('show');
-        }
-
-        //Results
-        function save_simulation() {
-            var save = d3.select("#save");
-            save.select("#nqueue-modal").text(rsf.nqueue);
-            save.select("#router-modal").text(rsf.router);
-            save.select("#lambda-modal").text(rsf.λ);
-            save.select("#imc-modal").text(rsf.imc.toFixed(3));
-
-            var table_param = save.select("#queue-parameters-save");
-            table_param.selectAll("tr").remove();
-            table_param.selectAll("tr").data(rsf.queues).enter()
-                .append("tr")
-                .html(function (d, i) {
-                    return `<th scope="col">${i}</th>` +
-                        `<td scope="col">${d.μ} pps</td>` +
-                        `<td scope="col">${d.tms.toFixed(3)} s</td>`
-                })
-
-            var table_results = save.select("#queue-results-save");
-            table_results.selectAll("tr").remove();
-            table_results.selectAll("tr").data(rsf.queues).enter()
-                .append("tr")
-                .html(function (d, i) {
-                    return `<th scope="col">${i}</th>` +
-                        `<td scope="col">${d.T.toFixed(3)}</td>` +
-                        `<td scope="col">${d.N}</td>` +
-                        `<td scope="col">${(d.U * 100).toFixed(1)}</td>` +
-                        `<td scope="col">${d.E("nf").toFixed(3)}</td>` +
-                        `<td scope="col">${d.σ("nf").toFixed(3)}</td>` +
-                        `<td scope="col">${d.E("tts").toFixed(3)}</td>` +
-                        `<td scope="col">${d.σ("tts").toFixed(3)}</td>` +
-                        `<td scope="col">${d.E("ic").toFixed(3)}</td>` +
-                        `<td scope="col">${d.σ("ic").toFixed(3)}</td>` +
-                        `<td scope="col">${d.E("ts").toFixed(3)}</td>` +
-                        `<td scope="col">${d.σ("ts").toFixed(3)}</td>` +
-                        `<td scope="col">${d.E("tef").toFixed(3)}</td>` +
-                        `<td scope="col">${d.σ("tef").toFixed(3)}</td>` +
-                        `<td scope="col">${d.E("tps").toFixed(3)}</td>` +
-                        `<td scope="col">${d.σ("tps").toFixed(3)}</td>` +
-                        `<td scope="col">${d.E("is").toFixed(3)}</td>` +
-                        `<td scope="col">${d.σ("is").toFixed(3)}</td>` +
-                        `<td scope="col">${(d.p0 * 100).toFixed(1)}</td>`
-                })
-
-            downloadFile(save.html(), `RSF.MM1.id-${rsf.id}.html`);
-        }
-        function save_log() {
-            var sep = ";";
-            var line = "\n";
-            str = ["id", "queue", "nf", "ic", "ts", "tcf", "tis", "tfs", "is"].join(sep)
-                + line
-                + rsf.queues.map((d, i) => {
-                    return d.log.map((e) => {
-                        return [e.id, i, e.nf, e.ic, e.ts, e.tcf, e.tis, e.tfs, e.is]
-                            .join(sep);
-                    }).join(line);
-                }).join(line);
-            downloadFile(str, `RSF.MM1.id-${rsf.id}-log.csv`);
-        }
-
-        //Comportamento dos botões
-        function btn_create() {
-            switch (state) {
-                case "none": case "stoped": case "created":
-                    create_netqueue(); break;
-                default: stop_simulation();
-            }
-        }
-        function btn_start() {
-            switch (state) {
-                case "started": pause_simulation(); break;
-                default: simulate();
-            }
-        }
-        function btn_settings() {
-            document.getElementById("n-package-input").value = "" + n_package;
-            document.getElementById("turn-input").value = "" + time_turn;
-            document.getElementById("transition-input").value = "" + transition_duration;
-            document.getElementById("interval-input").value = "" + state_duration;
-        }
-        function btn_update() {
-            n_package = parseFloat(document.getElementById("n-package-input").value);
-            time_turn = parseFloat(document.getElementById("turn-input").value);
-            transition_duration = parseFloat(document.getElementById("transition-input").value);
-            state_duration = parseFloat(document.getElementById("interval-input").value);
-        }
-
-        //Legenda
-        var legend_status = false;
-        function btn_legend() {
-            legend_status = !legend_status;
-            d3.select(".legend").transition().duration(500)
-                .attr("transform", `translate(10,${legend_status ? 390 : 585})`)
-                .select(".minimizer").select("path").attr("d", legend_status ? "M 4 8 L 10 16 16 8" : "M 4 12 L 10 4 16 12")
-        }
-
-        //Translate Settings
-        var n = { rx: 0, ry: 0 }
-        var drag = (() => {
-            function dragstarted(event) {
-                n.x = event.x;
-                n.y = event.y;
-            }
-            function dragged(event) {
-
-                d3.select(".translate-transform")
-                    .attr("transform", `translate(${n.rx - n.x + event.x},${n.ry - n.y + event.y})`);
-            }
-            function dragended(event) {
-                //d3.select(this).attr("stroke", null);
-                n.rx += event.x - n.x;
-                n.ry += event.y - n.y;
-            }
-            return d3.drag().on("start", dragstarted)
-                .on("drag", dragged).on("end", dragended);
-        })();
-        function resettranslation() {
-            n = { rx: 0, ry: 0 }
-            d3.select(".translate-transform")
-                .attr("transform", `translate(0,0)`);
-        }
-
-        //Zoom Settings
-        var scale = 1;
-        var m = { rx: 0, ry: 0 };
-        function zoom(z, x, y) {
-            var last = scale;
-            if (typeof z == "number")
-                scale = z;
-            else
-                scale *= z ? 1.1 : (1 / 1.1);
-            x = isNaN(x) ? 600 : x;
-            y = isNaN(y) ? 300 : y;
-
-
-            x = x / 1200;
-            y = y / 600;
-
-            x *= (scale - last) * 1200;
-            y *= (scale - last) * 600;
-
-            m.rx -= x;
-            m.ry -= y;
-
-            d3.select(".scale-transform")
-                .attr("transform", `scale(${scale},${scale})`);
-
-            d3.select(".net-queue")
-                .attr("transform", `translate(${m.rx},${m.ry})${rsf?rsf.scale_transform:""}`);
-            document.querySelector("#zoom-value-input").value = `${Math.round(scale * 100)}%`;
-            event.returnValue = false;
-        }
-
-        function input_zoom(e) {
-            zoom(parseFloat(e.target.value) / 100);
-        }
-        document.querySelector("#zoom-value-input")
-            .addEventListener('change', input_zoom);
-
-
-        function resetzoom() {
-            scale = 1;
-            m = { rx: 0, ry: 0 };
-            d3.select(".net-queue")
-                .attr("transform", `translate(0,0)${rsf?rsf.scale_transform:""}`)
-            d3.select(".scale-transform")
-                .attr("transform", `scale(1,1)`);
-            document.querySelector("#zoom-value-input").value = `100%`
-        }
-
-        function btn_resetzoom() {
-            resettranslation()
-            resetzoom()
-        }
-
-        d3.select(".drag-region").call(drag).on("wheel", (event) => {
-            zoom(event.wheelDelta > 0, event.x, event.y);
-        });
-
-
-        document.getElementById("lambda-input").value = "200";
-        document.getElementById("mi-input").value = "500, 950, 250, 250";
-        document.getElementById("router-input").value = "0, 1, 2, 1, 3, 1, 0"
-
-        n_package = 100;
-        time_turn = 0.001;
-        transition_duration = 2000;
-        state_duration = 500;
-
-        btn_settings();
-        resetzoom();
-
-
-    </script>
+    <script src="index.js"></script>
 </body>
 
 </html>
