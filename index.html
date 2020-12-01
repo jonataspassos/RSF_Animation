@@ -174,10 +174,42 @@
 
                     <!-- Barra de Cima -->
                     <g>
-                        <rect width="1200" height="36" fill="url(#grad2)"></rect>
+                        <rect width="1200" height="45" fill="url(#grad2)"></rect>
 
                         <!-- Cronômetro -->
-                        <g class="stopwatch"></g>
+                        <g class="stopwatch" transform="translate(10,15)" onclick=stopwatch_toggle()>
+                            <rect width=170 height="30" x=-10 style="opacity:0;"></rect>
+                            <g class="bi bi-stopwatch" fill="currentColor"
+                                transform="translate(0,-4.5)scale(1.5625,1.5625)">
+                                <path fill-rule="evenodd"
+                                    d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm8-7A8 8 0 1 1 0 8a8 8 0 0 1 16 0z" />
+                                <g transform="translate(8,8)">
+                                    <g id="second-stopwatch" transform="">
+                                        <path fill-rule="evenodd"
+                                            d="M0 -5.7 a.5.5 0 0 1 .5.5v5.21 a.5.5 0 0 1 -.5.5 a.5.5 0 0 1 -.5-.5 v-5.21a.5.5 0 0 1 .5-.5z" />
+                                    </g>
+                                    <g id="minute-stopwatch" transform="rotate(-120)">
+                                        <path fill="green"
+                                            d="M0.4 -0.4l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2a.5.5 0 0 1 -0.1 -.65z" />
+                                    </g>
+                                    <circle r="0.75"></circle>
+                                </g>
+                            </g>
+                            <g id="time-stopwatch" transform=translate(35,16) style=display:inherit;>
+                                <text class="min-sec" style="font-size:25px">00:00</text>
+                                <text class="mili" x=65 style="font-size:12px">000</text>
+                            </g>
+                            <g  id="turn-stopwatch" transform=translate(35,16) style=display:none;>
+                                <text class="nturn" x=60 style="font-size:25px; text-anchor:end">0</text>
+                                <text class="time-turn" x=65 style="font-size:12px">000</text>
+                            </g>
+                            <g transform=translate(130,-4.5)scale(1.5625,1.5625)>
+                                <path fill-rule="evenodd"
+                                    d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zm3.564 1.426L5.596 5 8 5.961 14.154 3.5l-2.404-.961zm3.25 1.7l-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464L7.443.184z" />
+                            </g>
+
+                            <text id="npackage-stopwatch" x=160 y=16 style="font-size:25px">0000</text>
+                        </g>
                         <!-- Controle de Zoom -->
                         <g class="zoom-control" transform="translate(1090,10)">
                             <g id="reset-zoom" class="btn btn-primary" onclick="btn_resetzoom()">

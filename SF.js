@@ -364,7 +364,7 @@ class Queue {
     }
     draw() {
         this.g.selectAll("circle").data([null]).enter().append("circle")
-            .attr("fill", "#218838")
+            .attr("fill", "#28a745")
             .attr("stroke", "#333")
             .attr("stroke-width", 3);
         this.g.select("circle").attr("r", 33).attr("cy", 30).attr("cx", 120);
@@ -646,7 +646,7 @@ class NetQueue {
                 }
                 this.queues[this.r[i]].g.select("circle").transition()
                     .duration(transition_duration * transition_in)
-                    .attr("fill", "#218838");
+                    .attr("fill", "#28a745");
                 if (last.y == now.y && last.x == now.x) {
                     out_p.transition()
                         .duration(transition_duration * (transition_in + transition_step1 + transition_step2 + transition_step3))

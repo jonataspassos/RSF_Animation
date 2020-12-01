@@ -2,6 +2,87 @@
 var state = "none";
 var rsf;
 
+//Stopwatch
+var time_show = true;
+var stopwatch_interval;
+var minute_angle = 240;
+function stopwatch_play() {
+    var stopwatch = d3.select(".stopwatch");
+    function stopwatch_format(s) {
+        var v = s.match(/([0-9]{2})/g);
+        return v ? v.map((d, i) => d * Math.pow(60, 1 - i)).reduce((t, d) => t + d) : 0;
+
+    }
+    function run() {
+        var time = rsf ? rsf.time : 0;
+        var mili = Math.round(time * time_turn * 1000) % 1000;
+        var seconds = Math.floor(time * time_turn);
+        stopwatch
+            .selectAll("text").data([seconds, mili, time, 999, Package.counter])
+            .transition().ease(d3.easeLinear)
+            .duration(state_duration)
+            .tween("text", function (d, j) {
+                var v = 0;
+                switch (j) {
+                    case 0: v = stopwatch_format(this.textContent); break;
+                    case 3: v = 0; break;
+                    default: v = parseInt(this.textContent); break
+                }
+                var i = d3.interpolate(v, d);
+                switch (j) {
+                    case 0: return function (t) {
+                        this.textContent = `${Math.floor(i(t) / 60) < 10 ? "0" : ""}${Math.floor(i(t) / 60)
+                            }:${Math.floor(i(t) % 60) < 10 ? "0" : ""}${Math.floor(i(t) % 60)}`;
+                    };
+                    case 1: case 3: return function (t) {
+                        this.textContent = `${i(t) < 100 ? "0" : ""}${i(t) < 10 ? "0" : ""}${Math.floor(i(t))}`;
+                    }
+                    default: return function (t) { this.textContent = Math.round(i(t)) };
+                }
+            });
+
+        d3.select("#second-stopwatch").transition().ease(d3.easeLinear)
+            .duration(state_duration/2).attr("transform", "rotate(180)")
+        d3.select("#second-stopwatch").transition().ease(d3.easeLinear)
+            .delay(state_duration/2)
+            .duration(state_duration/2).attr("transform", "rotate(359)")
+        minute_angle += 36;
+        d3.select("#minute-stopwatch").transition().ease(d3.easeLinear)
+            .duration(state_duration).attr("transform", `rotate(${minute_angle})`);
+
+        d3.select("#turn-stopwatch").select(".time-turn").transition().ease(d3.easeLinear)
+            .delay(state_duration).duration(0).text("000");
+        d3.select("#second-stopwatch").transition().ease(d3.easeLinear)
+            .delay(state_duration).duration(0).attr("transform", "rotate(0)")
+        minute_angle = minute_angle % 360;
+        d3.select("#minute-stopwatch").transition().ease(d3.easeLinear)
+            .delay(state_duration).duration(0).attr("transform", `rotate(${minute_angle})`);
+    };
+    run();
+    if (stopwatch_interval)
+        stopwatch_interval = clearInterval(stopwatch_interval), null;
+    stopwatch_interval = setInterval(run, transition_duration + state_duration);
+}
+
+function stopwatch_pause() {
+    if (stopwatch_interval)
+        stopwatch_interval = clearInterval(stopwatch_interval), null;
+}
+function stopwatch_stop() {
+    if (stopwatch_interval)
+        stopwatch_interval = clearInterval(stopwatch_interval), null;
+    d3.select(".stopwatch").selectAll("text").data(["00:00", "000", "0", "000", "0"])
+        .text((d) => d);
+    setTimeout(() => { d3.select(".stopwatch").selectAll("text").data(["00:00", "000", "0", "000", "0"]) }, 10)
+}
+
+function stopwatch_toggle() {
+    time_show = !time_show;
+    var s = d3.select(".stopwatch")
+    s.select("#time-stopwatch").style("display", time_show ? "inherit" : "none");
+    s.select("#turn-stopwatch").style("display", !time_show ? "inherit" : "none");
+}
+
 //Simulation
 function create_netqueue() {
     Queue.counter = 0;
@@ -18,6 +99,7 @@ function create_netqueue() {
     rsf = new NetQueue(lambda, mis, r, g).draw();
     g.attr("transform", `translate(${m.rx},${m.ry})${rsf.scale_transform}`)
 
+    stopwatch_stop();
 
     document.getElementById("start").disabled = false;
     d3.select("#create").text("criar").classed("btn-danger", false).classed("btn-primary", true)
@@ -35,6 +117,8 @@ function simulate() {
                 end_simulation()
             }
         }, state_duration + transition_duration)
+
+        stopwatch_play();
 
         d3.select("#start").text("pausar").classed("btn-info", true).classed("btn-success", false);
         d3.select("#create").text("parar").classed("btn-danger", true).classed("btn-primary", false);
@@ -55,6 +139,8 @@ function pause_simulation() {
 
     state = "paused";
 
+    stopwatch_pause();
+
     d3.select("#start").text("iniciar").classed("btn-info", false).classed("btn-success", true);
     d3.select("#create").text("parar").classed("btn-danger", true).classed("btn-primary", false);
     var inputs = document.querySelectorAll(".animation-param")
@@ -70,6 +156,7 @@ function stop_simulation() {
     var r = rsf.r;
 
     pause_simulation();
+    stopwatch_stop();
 
     var g = d3.select(".net-queue");
     g.selectAll("g").remove();
@@ -225,7 +312,7 @@ var legend_status = false;
 function btn_legend() {
     legend_status = !legend_status;
     d3.select(".legend").transition().duration(500)
-        .attr("transform", `translate(10,${legend_status ? 390 : 585})`)
+        .attr("transform", `translate(10,${legend_status ? -210 : -15})`)
         .select(".minimizer").select("path").attr("d", legend_status ? "M 4 8 L 10 16 16 8" : "M 4 12 L 10 4 16 12")
 }
 
@@ -313,14 +400,15 @@ d3.select(".drag-region").call(drag).on("wheel", (event) => {
 });
 
 
-document.getElementById("lambda-input").value = "200";
-document.getElementById("mi-input").value = "500, 950, 250, 250";
+document.getElementById("lambda-input").value = "2";
+document.getElementById("mi-input").value = "5, 10, 3, 3";
 document.getElementById("router-input").value = "0, 1, 2, 1, 3, 1, 0"
 
 n_package = 100;
-time_turn = 0.001;
+time_turn = 0.1;
 transition_duration = 2000;
 state_duration = 500;
 
 btn_settings();
+
 resetzoom();
