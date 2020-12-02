@@ -232,6 +232,9 @@ class LogPackage {
 
         return this;
     }
+    get tts(){
+        return this.tfs - this.tcf;
+    }
 }
 
 class Queue {
@@ -363,6 +366,7 @@ class Queue {
         return this.pack_queue.length > 0 || this.server_pack != null;
     }
     draw() {
+        var a = this;
         this.g.selectAll("circle").data([null]).enter().append("circle")
             .attr("fill", "#28a745")
             .attr("stroke", "#333")
@@ -372,6 +376,10 @@ class Queue {
         this.g.selectAll("path").data([null]).enter().append("path");
         this.g.select("path").attr("d", "M 0 0 L 90 0 90 60 0 60 0 55 85 55 85 5 0 5 z")
             .attr("fill", "#333");
+
+        this.g.classed("btn",true).classed("btn-primary",true).on("click",function(){
+            interaction_click(a);
+        })
         return this;
     }
     get μ() {
@@ -393,6 +401,14 @@ class Queue {
     }
     get p0() {
         return 1 - this.statistics.U.μ;
+    }
+    get nf() {
+        return this.pack_queue.length;
+    }
+    get tts_data(){
+        return this.log.slice((this.log.length-10)<0?0:(this.log.length-10),this.log.length).map(function(d,i){
+            return {key:i, value:d.tfs-d.tcf}
+        })
     }
     E(v) {
         if (v == "nf" || v == "U")
@@ -547,7 +563,7 @@ class NetQueue {
             for (var j = 0; j < this.queues[i].pack_queue.length; j++) {
                 q += ` ${this.queues[i].pack_queue[j].n}`;
             }
-            console.log(`\t(${this.queues[i].server_pack ? (this.queues[i].server_pack.n < 10 ? " " : "") + this.queues[i].server_pack.n : " N"})|${q} |`);
+            console.log(`\t${i}:\t(${this.queues[i].server_pack ? (this.queues[i].server_pack.n < 10 ? " " : "") + this.queues[i].server_pack.n : " N"})|${q} |`);
         }
         return this;
     }

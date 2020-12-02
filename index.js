@@ -2,6 +2,49 @@
 var state = "none";
 var rsf;
 
+//Interactions
+var last_d = undefined;
+var chart = jg.chart_line().width(181.93).height(65.5);
+function queue_click(d){
+    d3.select("#interaction-title").text("Sistema de Fila "+d.id);
+    d3.select(".interaction").select(".card").classed("border-danger",d.busy())
+        .classed("border-success",!d.busy())
+    d3.select("#interaction-queue-u").text(Math.round(d.U*100)+"%");
+    d3.select("#interaction-queue-mi").text(d.μ);
+    d3.select("#interaction-queue-nf-now").text(d.nf);
+    d3.select("#interaction-queue-nf-mean").text(Math.round(d.E("nf")));
+    d3.select("#interaction-queue-nf-max").text(Math.round(d.E("nf")));
+    d3.select("#interaction-queue-tts")//.transition().duration(1000)
+        .call(chart.data([{category:"1",list:d.tts_data}]))
+        .select("svg").attr("style","padding-left:20px").attr("width","100%").attr("height","100%");
+    d3.select(".queue-"+d.id).classed("shadow-active",true).attr("filter","url(#shadow)");
+    //
+}
+
+function interaction_click(d){
+    if(!rsf || !transition_duration)
+        return;
+    d = d?d:last_d;
+    last_d = d;
+    if(!d){
+        interaction_close();
+        return;
+    }
+    d3.selectAll(".interaction-card").attr("style","display:none;");
+    d3.selectAll(".shadow-active").classed("shadow-active",false).attr("filter",null);
+    if(d instanceof Queue){
+        queue_click(d);
+        d3.selectAll("#interaction-queue-card").attr("style","display:inherit;");
+    }
+    d3.select(".interaction").transition().duration(transition_duration/2).attr("transform","translate(950,-260)");
+}
+
+function interaction_close(){
+    last_d = null;
+    d3.select(".interaction").transition().duration(transition_duration/2).attr("transform","translate(950,0)");
+    d3.selectAll(".shadow-active").classed("shadow-active",false).attr("filter",null);
+}
+
 //Stopwatch
 var time_show = true;
 var stopwatch_interval;
@@ -105,6 +148,8 @@ function create_netqueue() {
     d3.select("#create").text("criar").classed("btn-danger", false).classed("btn-primary", true)
     d3.select("#start").text("iniciar").classed("btn-info", false).classed("btn-success", true);
     state = "created"
+
+    interaction_close()
 }
 function simulate() {
     if (rsf) {
@@ -116,6 +161,7 @@ function simulate() {
             if (rsf.closed && !rsf.busy()) {
                 end_simulation()
             }
+            interaction_click()
         }, state_duration + transition_duration)
 
         stopwatch_play();
@@ -170,6 +216,8 @@ function stop_simulation() {
     d3.select("#create").text("criar").classed("btn-danger", false).classed("btn-primary", true)
     d3.select("#start").text("iniciar").classed("btn-info", false).classed("btn-success", true);
     state = "stoped";
+
+    interaction_close()
 
 }
 function end_simulation() {
@@ -400,15 +448,19 @@ d3.select(".drag-region").call(drag).on("wheel", (event) => {
 });
 
 
-document.getElementById("lambda-input").value = "2";
-document.getElementById("mi-input").value = "5, 10, 3, 3";
-document.getElementById("router-input").value = "0, 1, 2, 1, 3, 1, 0"
+document.getElementById("lambda-input").value = "1000";
+document.getElementById("mi-input").value = "2500 4750 1250 1250";
+document.getElementById("router-input").value = "0 1 2 1 3 1 0"
 
 n_package = 100;
-time_turn = 0.1;
+time_turn = 0.0001;
 transition_duration = 2000;
 state_duration = 500;
 
 btn_settings();
 
 resetzoom();
+
+/*
+
+*/
