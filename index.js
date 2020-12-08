@@ -12,8 +12,8 @@ function queue_click(d){
     d3.select("#interaction-queue-u").text(Math.round(d.U*100)+"%");
     d3.select("#interaction-queue-mi").text(d.μ);
     d3.select("#interaction-queue-nf-now").text(d.nf);
-    d3.select("#interaction-queue-nf-mean").text(Math.round(d.E("nf")));
-    d3.select("#interaction-queue-nf-max").text(Math.round(d.E("nf")));
+    d3.select("#interaction-queue-nf-mean").text(d.E("nf").toFixed(2));
+    d3.select("#interaction-queue-nf-max").text(Math.round(d.max_nf));
     d3.select("#interaction-queue-tts")//.transition().duration(1000)
         .call(chart.data([{category:"1",list:d.tts_data}]))
         .select("svg").attr("style","padding-left:20px").attr("width","100%").attr("height","100%");
@@ -197,8 +197,8 @@ function stop_simulation() {
     Queue.counter = 0;
     Package.counter = 0;
 
-    var l = rsf.l / time_turn;
-    var m = rsf.m.map((d) => d / time_turn);
+    var l = rsf.l/time_turn;
+    var m = rsf.m.map((d) => d);
     var r = rsf.r;
 
     pause_simulation();

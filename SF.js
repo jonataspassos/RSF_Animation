@@ -232,7 +232,7 @@ class LogPackage {
 
         return this;
     }
-    get tts(){
+    get tts() {
         return this.tfs - this.tcf;
     }
 }
@@ -272,6 +272,7 @@ class Queue {
             U: new EDP()
         };
         this.statistics.tps = this.statistics.ts;
+        this.max_nf = 0;
 
         this.turned = -1;
 
@@ -294,7 +295,9 @@ class Queue {
             this.pack_queue.push(next);//entra na fila
             next.nf.push(this.pack_queue.length - 1);//Salva quantos pacotes tinha na fila quando o pacote chegou;
 
-            this.statistics.nf.insert(this.pack_queue.length - 1);
+            this.statistics.nf.insert(this.pack_queue.length-1);
+            this.max_nf = this.max_nf < (this.pack_queue.length) ? this.pack_queue.length : this.max_nf;
+
             if (this.log.length)
                 this.statistics.ic.insert(time - this.log[this.log.length - 1].tcf);
         }
@@ -377,7 +380,7 @@ class Queue {
         this.g.select("path").attr("d", "M 0 0 L 90 0 90 60 0 60 0 55 85 55 85 5 0 5 z")
             .attr("fill", "#333");
 
-        this.g.classed("btn",true).classed("btn-primary",true).on("click",function(){
+        this.g.classed("btn", true).classed("btn-primary", true).on("click", function () {
             interaction_click(a);
         })
         return this;
@@ -405,9 +408,9 @@ class Queue {
     get nf() {
         return this.pack_queue.length;
     }
-    get tts_data(){
-        return this.log.slice((this.log.length-10)<0?0:(this.log.length-10),this.log.length).map(function(d,i){
-            return {key:i, value:d.tfs-d.tcf}
+    get tts_data() {
+        return this.log.slice((this.log.length - 10) < 0 ? 0 : (this.log.length - 10), this.log.length).map(function (d, i) {
+            return { key: i, value: d.tfs - d.tcf }
         })
     }
     E(v) {
@@ -447,6 +450,7 @@ class NetQueue {
         this.r = r;
 
         //Criação dos Sistemas de fila
+        this.g.append("g").classed("pathes", true);
         var queues_d3 = this.g.append("g").classed("queues", true);
         this.g.append("g").classed("packages", true);
 
@@ -593,8 +597,8 @@ class NetQueue {
             .enter().append("path").attr("class", function (d, i) { return i ? "door" : "base" })
             .attr("d", function (d) { return d })
             .attr("fill", "#0069d9")
-            .attr("stroke","#0069d9")
-            .attr("stroke-width",1);
+            .attr("stroke", "#0069d9")
+            .attr("stroke-width", 1);
         this.input.selectAll("text").data([null]).enter().append("text")
             .attr("text-anchor", "middle")
             .attr("x", 50).text("IN")
@@ -606,8 +610,8 @@ class NetQueue {
             .enter().append("path").attr("class", function (d, i) { return i ? "door" : "base" })
             .attr("d", function (d) { return d })
             .attr("fill", "#0069d9")
-            .attr("stroke","#0069d9")
-            .attr("stroke-width",1);
+            .attr("stroke", "#0069d9")
+            .attr("stroke-width", 1);
         this.output.selectAll("text").data([null]).enter().append("text")
             .attr("text-anchor", "middle")
             .attr("x", 50).text("OUT")
@@ -663,6 +667,16 @@ class NetQueue {
                 this.queues[this.r[i]].g.select("circle").transition()
                     .duration(transition_duration * transition_in)
                     .attr("fill", "#28a745");
+
+                this.g.select(".pathes").select(".path-"+i).transition()
+                    .duration(transition_duration * transition_in)
+                    .attr("style","opacity:1");
+                
+                this.g.select(".pathes").select(".path-"+i).transition()
+                    .delay(transition_duration * (transition_in + transition_step1 + transition_step2 + transition_step3))
+                    .duration(transition_duration * transition_in)
+                    .attr("style","opacity:0");
+
                 if (last.y == now.y && last.x == now.x) {
                     out_p.transition()
                         .duration(transition_duration * (transition_in + transition_step1 + transition_step2 + transition_step3))
@@ -711,6 +725,14 @@ class NetQueue {
                 .duration(transition_duration * transition_in)
                 .attr("transform", `translate(${last.x},${last.y})`);
 
+            this.queues[this.r[this.r.length-1]].g.select("circle").transition()
+                .duration(transition_duration * transition_in)
+                .attr("fill", "#28a745");
+            
+            this.g.select(".pathes").select(".path-out").transition()
+                .duration(transition_duration * transition_in)
+                .attr("style","opacity:1");
+
             out_p.transition()
                 .delay(transition_duration * transition_in)
                 .duration(transition_duration * (transition_step1))
@@ -730,6 +752,11 @@ class NetQueue {
                 .delay(transition_duration * (transition_in + transition_step1 + transition_step2 + transition_step3))
                 .duration(transition_duration * transition_in)
                 .attr("d", "M 75 25 L 75 75 100 50");
+
+            this.g.select(".pathes").select(".path-out").transition()
+                .delay(transition_duration * (transition_in + transition_step1 + transition_step2 + transition_step3))
+                .duration(transition_duration * transition_in)
+                .attr("style","opacity:0");
 
             var a = this;
             setTimeout(() => { this.out = null; }, transition_duration + 10);
@@ -766,6 +793,65 @@ class NetQueue {
                     .attr("fill", "#dc3545");
 
         }
+        var a = this;
+        //Draw Pathes
+        this.g.select(".pathes").selectAll("path")
+            .data(this.r.map(function (d, i, r) {
+                return { d1: a.queues[d], d2: a.queues[r[i + 1]] }
+            }).slice(0, a.r.length - 1)).enter().append("path").attr("class", function (d, i) { return "path-" + i })
+            .attr("stroke", "#138496").attr("stroke-width", "3px").attr("stroke-dasharray", "5 15")
+            .attr("fill", "none").attr("style", "opacity:0")
+            .attr("d", function (d) {
+
+                var cruzer_h = vertical_padding - 30;
+                var center_last = {
+                    x: 100 + horizontal_padding + d.d1.x_index * (150 + horizontal_padding) + 120,
+                    y: vertical_padding + d.d1.y_index * (vertical_padding + 60) + 30
+                }
+
+                var last = {
+                    x: 100 + horizontal_padding + d.d1.x_index *
+                        (150 + horizontal_padding) + 180,
+                    y: vertical_padding + d.d1.y_index *
+                        (vertical_padding + 60) + 30
+                }
+
+                var now = {
+                    x: 100 + horizontal_padding + d.d2.x_index *
+                        (150 + horizontal_padding) - 50,
+                    y: vertical_padding + d.d2.y_index *
+                        (vertical_padding + 60) + 30
+                }
+
+                var center_now = {
+                    x: 100 + horizontal_padding + d.d2.x_index * (150 + horizontal_padding),
+                    y: vertical_padding + d.d2.y_index * (vertical_padding + 60) + 30
+                }
+
+                return `M ${center_last.x} ${center_last.y} L ${last.x} ${last.y} ${last.x != now.x ?
+                    `${last.x} ${cruzer_h} ${now.x} ${cruzer_h}` : ""
+                    } ${now.x} ${now.y} ${center_now.x} ${center_now.y}`
+
+            });
+
+        var center_last = {
+            x: 100 + horizontal_padding + this.queues[this.r[this.r.length - 1]].x_index * (150 + horizontal_padding) + 120,
+            y: vertical_padding + this.queues[this.r[this.r.length - 1]].y_index * (vertical_padding + 60) + 30
+        }
+
+        var last = {
+            x: center_last.x + 60,
+            y: center_last.y
+        }
+
+        this.g.select(".pathes").selectAll(".path-out")
+            .data([`M ${center_last.x} ${center_last.y} L ${last.x} ${last.y} ${last.x} ${vertical_out + 30} ${25} ${vertical_out + 30} `])
+            .enter().append("path").attr("class","path-out")
+            .attr("stroke", "#138496")
+            .attr("stroke-width", "3px")
+            .attr("stroke-dasharray", "5 15")
+            .attr("fill", "none").attr("style", "opacity:0")
+            .attr("d", function (d) { return d });
         return this;
     }
 }
